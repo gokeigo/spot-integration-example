@@ -10,6 +10,7 @@ import ModalIframe from "./modal-iframe";
 import { usePublicKey } from "~/hooks/use-public-key";
 import { PiggyBank } from "lucide-react";
 import DivIframe from "./div-iframe";
+import { type GokeiWidgetResponse } from "~/types/gokei-spot";
 
 function AppointmentConfirmation() {
   const [patient] = useAtom(patientAtom);
@@ -46,7 +47,7 @@ function AppointmentConfirmation() {
           );
 
           if (response.ok) {
-            const data = await response.json();
+            const data = (await response.json()) as GokeiWidgetResponse;
             console.log("Gokei widget initialized:", data);
             setWidgetUrl(data.url);
             setIsModalOpen(true);
@@ -59,7 +60,7 @@ function AppointmentConfirmation() {
       }
     };
 
-    initializeGokeiWidget();
+    void initializeGokeiWidget();
   }, [patient, publicKey]);
 
   if (integrationType === "div") {
