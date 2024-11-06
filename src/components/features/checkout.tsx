@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { type GokeiIsUserSubscribedResponse } from "~/types/gokei-spot";
 
 export const Checkout = () => {
   const [patient, setPatient] = useAtom(patientAtom);
@@ -42,7 +43,7 @@ export const Checkout = () => {
         const response = await fetch(
           `${env.NEXT_PUBLIC_GOKEI_API_URL}/is_user_subscribed?public_key=${env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY}&rut=${patient.rut}`,
         );
-        const data = await response.json();
+        const data = (await response.json()) as GokeiIsUserSubscribedResponse;
         setIsSubscribed(data.is_subscribed);
       } catch (error) {
         console.error("Error checking subscription:", error);
