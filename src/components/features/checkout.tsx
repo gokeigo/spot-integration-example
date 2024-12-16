@@ -122,7 +122,7 @@ export const Checkout = () => {
                 className="inline-flex flex-col text-sm text-gray-600"
               >
                 <Image
-                  src={GokeiLogo}
+                  src={GokeiLogo as string}
                   alt="Gokei Logo"
                   width={120}
                   height={120}
