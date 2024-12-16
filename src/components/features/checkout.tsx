@@ -12,13 +12,17 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { type GokeiIsUserSubscribedResponse } from "~/types/gokei-spot";
+import GokeiLogo from "~/assets/gokei-logo.svg";
+import Image from "next/image";
 
 export const Checkout = () => {
   const [patient, setPatient] = useAtom(patientAtom);
   const [isChecked, setIsChecked] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState<boolean | undefined>(undefined);
+  const [isSubscribed, setIsSubscribed] = useState<boolean | undefined>(
+    undefined,
+  );
 
   const basePrice = 75000;
   const platformFee = 5000;
@@ -104,7 +108,7 @@ export const Checkout = () => {
         </div>
 
         <div className="mb-6">
-          <div className="mb-4 flex items-center gap-2">
+          <div className="mb-4 flex items-center gap-4">
             <input
               type="checkbox"
               id="insurance-checkbox"
@@ -112,33 +116,45 @@ export const Checkout = () => {
               onChange={handleCheckboxChange}
               className="mt-1 h-4 w-4 rounded border-gray-300"
             />
-            <label
-              htmlFor="insurance-checkbox"
-              className="text-sm text-gray-600"
-            >
-              Reembolsar automáticamente en mi isapre y seguro(s)
-            </label>
-            <TooltipProvider delayDuration={100}>
-              <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-                {/* Make the tooltip responsive */}
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setTooltipOpen(!tooltipOpen)}
-                    className="mt-1 text-gray-400 hover:text-gray-600"
-                  >
-                    <Info className="h-4 w-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <div className="max-w-sm">
-                    <p className="text-sm">
-                      Acepto el servicio de reembolsos de Gokei, quienes me informarán
-                      por email o WhatsApp el status de mi reembolso.
-                    </p>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="insurance-checkbox"
+                className="inline-flex flex-col text-sm text-gray-600"
+              >
+                <Image
+                  src={GokeiLogo}
+                  alt="Gokei Logo"
+                  width={120}
+                  height={120}
+                  unoptimized
+                />
+                <span>
+                  Reembolsar automáticamente en mi isapre y seguro(s)
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+                      {/* Make the tooltip responsive */}
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => setTooltipOpen(!tooltipOpen)}
+                          className="ml-2 mt-1 text-gray-400 hover:text-gray-600"
+                        >
+                          <Info className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div className="max-w-sm">
+                          <p className="text-sm">
+                            Acepto el servicio de reembolsos de Gokei, quienes
+                            me informarán por email o WhatsApp el status de mi
+                            reembolso.
+                          </p>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </span>
+              </label>
+            </div>
           </div>
 
           <div className="rounded-lg bg-gray-50 p-4">
