@@ -14,9 +14,11 @@ import {
 import { type GokeiIsUserSubscribedResponse } from "~/types/gokei-spot";
 import GokeiLogo from "~/assets/gokei-logo.svg";
 import Image from "next/image";
+import { usePublicKey } from "~/hooks/use-public-key";
 
 export const Checkout = () => {
   const [patient, setPatient] = useAtom(patientAtom);
+  const { publicKey } = usePublicKey();
   const [isChecked, setIsChecked] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +47,7 @@ export const Checkout = () => {
       setIsLoading(true);
       try {
         const response = await fetch(
-          `${env.NEXT_PUBLIC_GOKEI_API_URL}/is_user_subscribed?public_key=${env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY}&rut=${patient.rut}`,
+          `${env.NEXT_PUBLIC_GOKEI_API_URL}/is_user_subscribed?public_key=${publicKey}&rut=${patient.rut}`,
         );
         const data = (await response.json()) as GokeiIsUserSubscribedResponse;
         setIsSubscribed(data.is_subscribed);
