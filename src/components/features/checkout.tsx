@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { type GokeiIsUserSubscribedResponse } from "~/types/gokei-spot";
-import GokeiLogo from "~/assets/gokei-logo.svg";
+import GokeiLogo from "~/assets/skip-logo-icon-purple.svg";
 import Image from "next/image";
 import { usePublicKey } from "~/hooks/use-public-key";
 
@@ -91,7 +91,7 @@ export const Checkout = () => {
                 {!isLoading &&
                   (isSubscribed ? (
                     <span className="text-nowrap text-green-600">
-                      Gratis - Usuario Gokei
+                      Gratis - Usuario Skip
                     </span>
                   ) : (
                     formatPrice(reimbursementFee)
@@ -125,7 +125,7 @@ export const Checkout = () => {
               >
                 <Image
                   src={GokeiLogo as string}
-                  alt="Gokei Logo"
+                  alt="Skip Logo"
                   width={120}
                   height={120}
                   unoptimized
@@ -146,7 +146,7 @@ export const Checkout = () => {
                       <TooltipContent>
                         <div className="max-w-sm">
                           <p className="text-sm">
-                            Acepto el servicio de reembolsos de Gokei, quienes
+                            Acepto el servicio de reembolsos de Skip, quienes
                             me informarán por email o WhatsApp el status de mi
                             reembolso.
                           </p>

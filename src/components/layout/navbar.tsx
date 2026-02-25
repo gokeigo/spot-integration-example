@@ -10,7 +10,7 @@ export const Navbar = () => {
         <Link href="/">
           <Image
             src="/generic-telemedicine-logo.png"
-            alt="Logo de Ejemplo de integración Gokei Spot"
+            alt="Logo de Ejemplo de integración Skip Spot"
             width={75}
             height={75}
           />

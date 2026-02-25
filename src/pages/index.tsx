@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Ejemplo de integración Gokei Spot</title>
+        <title>Ejemplo de integración Skip Spot</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">

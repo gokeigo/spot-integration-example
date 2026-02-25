@@ -44,7 +44,7 @@ export function PublicKeyModal() {
         <section>
           <h2 className="text-xl font-bold">Ingrese su llave pública</h2>
           <p className="pb-4 text-gray-500">
-            Por favor, ingrese su llave pública de Gokei Spot para continuar.
+            Por favor, ingrese su llave pública de Skip Spot para continuar.
           </p>
           <div className="flex items-center gap-4">
             <input
@@ -67,7 +67,7 @@ export function PublicKeyModal() {
               className="border p-2"
             />
             <label htmlFor="patient-type-1" className="text-gray-600">
-              Usuario registrado en Gokei
+              Usuario registrado en Skip
             </label>
             <input
               type="radio"
@@ -78,7 +78,7 @@ export function PublicKeyModal() {
               className="border p-2"
             />
             <label htmlFor="patient-type-2" className="text-gray-600">
-              Usuario no registrado en Gokei
+              Usuario no registrado en Skip
             </label>
           </div>
         </section>
