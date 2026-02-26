@@ -1,29 +1,38 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Settings2, ExternalLink } from "lucide-react";
 import { usePublicKey } from "~/hooks/use-public-key";
 
 export const Navbar = () => {
   const { setShowModal } = usePublicKey();
   return (
-    <nav className="bg-white">
-      <div className="mx-auto flex max-w-screen-xl items-center justify-between p-4">
+    <nav className="border-b border-gray-100 bg-white shadow-sm">
+      <div className="mx-auto flex max-w-screen-xl items-center justify-between px-4 py-3">
         <Link href="/">
           <Image
             src="/generic-telemedicine-logo.png"
             alt="Logo de Ejemplo de integración Skip Spot"
-            width={75}
-            height={75}
+            width={48}
+            height={48}
           />
         </Link>
-        <button
-          onClick={() => setShowModal(true)}
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          Configuración ejemplo
-        </button>
-        <Link href="https://gokei.readme.io/" target="_blank">
-          <p className="text-center text-lg font-semibold">Ver documentación</p>
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900"
+          >
+            <Settings2 className="h-4 w-4" />
+            Configuración
+          </button>
+          <Link
+            href="https://gokei.readme.io/"
+            target="_blank"
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Documentación
+          </Link>
+        </div>
       </div>
     </nav>
   );

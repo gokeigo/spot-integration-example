@@ -109,53 +109,50 @@ export const Checkout = () => {
         </div>
 
         <div className="mb-6">
-          <div className="mb-4 flex items-center gap-4">
+          <div className="mb-4 flex items-start gap-3">
             <input
               type="checkbox"
               id="insurance-checkbox"
               checked={isChecked}
               onChange={handleCheckboxChange}
-              className="mt-1 h-4 w-4 rounded border-gray-300"
+              className="mt-1 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-300 accent-blue-600"
             />
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="insurance-checkbox"
-                className="inline-flex flex-col text-sm text-gray-600"
-              >
-                <Image
-                  src={GokeiLogo as string}
-                  alt="Skip Logo"
-                  width={120}
-                  height={120}
-                  unoptimized
-                />
-                <span>
-                  Reembolsar automáticamente en mi isapre y seguro(s)
-                  <TooltipProvider delayDuration={100}>
-                    <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-                      {/* Make the tooltip responsive */}
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => setTooltipOpen(!tooltipOpen)}
-                          className="ml-2 mt-1 text-gray-400 hover:text-gray-600"
-                        >
-                          <Info className="h-4 w-4" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <div className="max-w-sm">
-                          <p className="text-sm">
-                            Acepto el servicio de reembolsos de Skip, quienes
-                            me informarán por email o WhatsApp el status de mi
-                            reembolso.
-                          </p>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </span>
-              </label>
-            </div>
+            <label
+              htmlFor="insurance-checkbox"
+              className="flex cursor-pointer flex-col gap-1 text-sm text-gray-600"
+            >
+              <Image
+                src={GokeiLogo as string}
+                alt="Skip Logo"
+                width={120}
+                height={120}
+                unoptimized
+              />
+              <span className="flex items-center gap-1">
+                Reembolsar automáticamente en mi isapre y seguro(s)
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => setTooltipOpen(!tooltipOpen)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="max-w-sm">
+                        <p className="text-sm">
+                          Acepto el servicio de reembolsos de Skip, quienes me
+                          informarán por email o WhatsApp el status de mi
+                          reembolso.
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </span>
+            </label>
           </div>
 
           <div className="rounded-lg bg-gray-50 p-4">

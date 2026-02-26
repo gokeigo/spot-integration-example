@@ -23,7 +23,7 @@ export const ServiceSummary = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-gray-500" />
-              <span className="text-gray-600">Mañana, 14:00 hrs. EST</span>
+              <span className="text-gray-600">Mañana, 14:00 hrs.</span>
             </div>
             <div className="flex items-center gap-3">
               <Stethoscope className="h-5 w-5 text-gray-500" />

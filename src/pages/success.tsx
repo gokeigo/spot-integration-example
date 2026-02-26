@@ -9,7 +9,7 @@ export default function Success() {
         <title>Skip Spot: Éxito!</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="min-h-screen bg-gray-50 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
         <Navbar />
         <AppointmentConfirmation />
       </main>

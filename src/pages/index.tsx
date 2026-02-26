@@ -12,7 +12,12 @@ export default function Home() {
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
         <Navbar />
         <div className="mx-auto max-w-7xl px-4 py-8">
-          <h1 className="mb-8 text-3xl font-bold text-gray-900">Checkout</h1>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Ejemplo de integración de Skip Spot en un flujo de pago
+            </p>
+          </div>
           <Checkout />
         </div>
       </main>
