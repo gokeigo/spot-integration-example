@@ -11,6 +11,8 @@ export function PublicKeyModal() {
     showModal,
     setShowModal,
     setPublicKey,
+    reimbursementFee,
+    setReimbursementFee,
   } = usePublicKey();
   const [patient, setPatient] = useAtom(patientAtom);
   const alreadyRegisteredRut = "3367999-7";
@@ -20,14 +22,17 @@ export function PublicKeyModal() {
   const [draftPatientRut, setDraftPatientRut] = useState(patient.rut);
   const [draftIntegrationType, setDraftIntegrationType] =
     useState(integrationType);
+  const [draftReimbursementFee, setDraftReimbursementFee] =
+    useState(reimbursementFee);
 
   useEffect(() => {
     if (showModal) {
       setDraftKey(publicKey);
       setDraftPatientRut(patient.rut);
       setDraftIntegrationType(integrationType);
+      setDraftReimbursementFee(reimbursementFee);
     }
-  }, [showModal, publicKey, patient.rut, integrationType]);
+  }, [showModal, publicKey, patient.rut, integrationType, reimbursementFee]);
 
   if (!showModal) return null;
 
@@ -35,6 +40,7 @@ export function PublicKeyModal() {
     setPublicKey(draftKey);
     setPatient((prev) => ({ ...prev, rut: draftPatientRut }));
     setintegrationType(draftIntegrationType);
+    setReimbursementFee(draftReimbursementFee);
     setShowModal(false);
   };
 
@@ -67,7 +73,7 @@ export function PublicKeyModal() {
               className="border p-2"
             />
             <label htmlFor="patient-type-1" className="text-gray-600">
-              Usuario registrado en Skip
+              Usuario no registrado en Skip
             </label>
             <input
               type="radio"
@@ -78,7 +84,7 @@ export function PublicKeyModal() {
               className="border p-2"
             />
             <label htmlFor="patient-type-2" className="text-gray-600">
-              Usuario no registrado en Skip
+              Usuario registrado en Skip
             </label>
           </div>
         </section>
@@ -108,6 +114,22 @@ export function PublicKeyModal() {
             <label htmlFor="simulation-type-2" className="text-gray-600">
               Div directo
             </label>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold">Servicio de Reembolso</h2>
+          <p className="pb-4 text-gray-500">
+            Monto a cobrar por el servicio de reembolso (en pesos).
+          </p>
+          <div className="flex items-center gap-4">
+            <input
+              type="number"
+              value={draftReimbursementFee}
+              onChange={(e) => setDraftReimbursementFee(Number(e.target.value))}
+              className="border p-2"
+              min={0}
+            />
           </div>
         </section>
 

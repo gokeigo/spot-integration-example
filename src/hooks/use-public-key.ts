@@ -1,11 +1,12 @@
 import { useAtom } from "jotai";
-import { publicKeyAtom, showModalAtom, integrationTypeAtom } from "~/atoms/simulation-settings";
+import { publicKeyAtom, showModalAtom, integrationTypeAtom, reimbursementFeeAtom } from "~/atoms/simulation-settings";
 import { env } from "~/env";
 
 export function usePublicKey() {
   const [integrationType, setintegrationType] = useAtom(integrationTypeAtom);
   const [publicKey, setPublicKey] = useAtom(publicKeyAtom);
   const [showModal, setShowModal] = useAtom(showModalAtom);
+  const [reimbursementFee, setReimbursementFee] = useAtom(reimbursementFeeAtom);
 
   return {
     integrationType,
@@ -14,5 +15,7 @@ export function usePublicKey() {
     setPublicKey,
     showModal,
     setShowModal,
+    reimbursementFee,
+    setReimbursementFee,
   };
 }

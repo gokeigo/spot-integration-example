@@ -18,7 +18,7 @@ import { usePublicKey } from "~/hooks/use-public-key";
 
 export const Checkout = () => {
   const [patient, setPatient] = useAtom(patientAtom);
-  const { publicKey } = usePublicKey();
+  const { publicKey, reimbursementFee } = usePublicKey();
   const [isChecked, setIsChecked] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +28,6 @@ export const Checkout = () => {
 
   const basePrice = 75000;
   const platformFee = 5000;
-  const reimbursementFee = 1000;
 
   const calculateTotal = () => {
     let total = basePrice + platformFee;

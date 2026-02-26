@@ -8,3 +8,7 @@ export const integrationTypeAtom = atomWithStorage<string>(
   "gokei-integration-type",
   "modal",
 );
+export const reimbursementFeeAtom = atomWithStorage<number>(
+  "gokei-reimbursement-fee",
+  1000,
+);

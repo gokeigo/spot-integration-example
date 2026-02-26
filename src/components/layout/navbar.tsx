@@ -17,8 +17,9 @@ export const Navbar = () => {
         </Link>
         <button
           onClick={() => setShowModal(true)}
+          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
         >
-          Configuración
+          Configuración ejemplo
         </button>
         <Link href="https://gokei.readme.io/" target="_blank">
           <p className="text-center text-lg font-semibold">Ver documentación</p>
