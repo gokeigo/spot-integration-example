@@ -97,8 +97,15 @@ export function PublicKeyModal() {
               value={draftKey}
               onChange={(e) => setDraftKey(e.target.value)}
               placeholder="pk_..."
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 ${
+                draftKey.trim() === ""
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                  : "border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
+              }`}
             />
+            {draftKey.trim() === "" && (
+              <p className="text-xs text-red-500">Este campo es obligatorio.</p>
+            )}
           </section>
 
           <div className="border-t border-gray-100" />
@@ -237,7 +244,8 @@ export function PublicKeyModal() {
           </button>
           <button
             onClick={handleSave}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            disabled={draftKey.trim() === ""}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Guardar cambios
           </button>
