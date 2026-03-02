@@ -59,7 +59,7 @@ export const ModalIframe = ({ url, isOpen, onClose }: ModalIframeProps) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div className="relative rounded-lg bg-white">
-        <iframe src={url} className="h-[820px] w-80 rounded-lg" />
+        <iframe src={url} className="h-[820px] w-80 rounded-lg sm:w-[480px]" />
       </div>
     </div>
   );
