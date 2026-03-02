@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { X } from "lucide-react";
 import { usePublicKey } from "~/hooks/use-public-key";
 import { patientAtom } from "~/atoms/patient";
@@ -15,6 +16,7 @@ export function PublicKeyModal() {
     reimbursementFee,
     setReimbursementFee,
   } = usePublicKey();
+  const router = useRouter();
   const [patient, setPatient] = useAtom(patientAtom);
   const alreadyRegisteredRut = "3367999-7";
   const notRegisteredRut = "11111111-k";
@@ -24,14 +26,21 @@ export function PublicKeyModal() {
   const [draftIntegrationType, setDraftIntegrationType] =
     useState(integrationType);
   const [draftReimbursementFee, setDraftReimbursementFee] =
-    useState(reimbursementFee);
+    useState(reimbursementFee === 0 ? 1000 : reimbursementFee);
+  const [draftReimbursementMode, setDraftReimbursementMode] = useState<
+    "free_trial" | "paid"
+  >(reimbursementFee === 0 ? "free_trial" : "paid");
 
   useEffect(() => {
     if (showModal) {
       setDraftKey(publicKey);
       setDraftPatientRut(patient.rut);
       setDraftIntegrationType(integrationType);
-      setDraftReimbursementFee(reimbursementFee);
+      setDraftReimbursementFee(reimbursementFee === 0 ? 1000 : reimbursementFee);
+      setDraftReimbursementMode(reimbursementFee === 0 ? "free_trial" : "paid");
+      if (router.pathname !== "/") {
+        void router.push("/");
+      }
     }
   }, [showModal, publicKey, patient.rut, integrationType, reimbursementFee]);
 
@@ -41,7 +50,9 @@ export function PublicKeyModal() {
     setPublicKey(draftKey);
     setPatient((prev) => ({ ...prev, rut: draftPatientRut }));
     setintegrationType(draftIntegrationType);
-    setReimbursementFee(draftReimbursementFee);
+    setReimbursementFee(
+      draftReimbursementMode === "free_trial" ? 0 : draftReimbursementFee,
+    );
     setShowModal(false);
   };
 
@@ -162,23 +173,57 @@ export function PublicKeyModal() {
 
           <div className="border-t border-gray-100" />
 
-          {/* Reimbursement fee */}
-          <section className="flex flex-col gap-1.5">
-            <label
-              htmlFor="reimbursement-fee-input"
-              className="text-sm font-medium text-gray-700"
-            >
-              Costo del servicio de reembolso
-            </label>
-            <p className="text-xs text-gray-400">Monto en pesos (CLP)</p>
-            <input
-              id="reimbursement-fee-input"
-              type="number"
-              value={draftReimbursementFee}
-              onChange={(e) => setDraftReimbursementFee(Number(e.target.value))}
-              min={0}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-            />
+          {/* Reimbursement mode */}
+          <section className="flex flex-col gap-2">
+            <p className="text-sm font-medium text-gray-700">
+              Servicio de reembolso
+            </p>
+            <div className="flex flex-col gap-2">
+              <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 transition hover:bg-gray-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                <input
+                  type="radio"
+                  name="reimbursement-mode"
+                  checked={draftReimbursementMode === "free_trial"}
+                  onChange={() => setDraftReimbursementMode("free_trial")}
+                  className="accent-blue-600"
+                />
+                <span className="flex items-center gap-2 text-sm text-gray-700">
+                  2 rendiciones gratis
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                    Prueba gratis
+                  </span>
+                </span>
+              </label>
+              <label className="flex cursor-pointer flex-col gap-2 rounded-lg border border-gray-200 px-3 py-2.5 transition hover:bg-gray-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="reimbursement-mode"
+                    checked={draftReimbursementMode === "paid"}
+                    onChange={() => setDraftReimbursementMode("paid")}
+                    className="accent-blue-600"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Costo del servicio de reembolso
+                  </span>
+                </div>
+                {draftReimbursementMode === "paid" && (
+                  <div className="flex flex-col gap-1 pl-7">
+                    <p className="text-xs text-gray-400">Monto en pesos (CLP)</p>
+                    <input
+                      id="reimbursement-fee-input"
+                      type="number"
+                      value={draftReimbursementFee}
+                      onChange={(e) =>
+                        setDraftReimbursementFee(Number(e.target.value))
+                      }
+                      min={1}
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                )}
+              </label>
+            </div>
           </section>
         </div>
 

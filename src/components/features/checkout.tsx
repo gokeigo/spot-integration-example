@@ -92,6 +92,10 @@ export const Checkout = () => {
                     <span className="text-nowrap text-green-600">
                       Gratis - Usuario Skip
                     </span>
+                  ) : reimbursementFee === 0 ? (
+                    <span className="text-nowrap text-green-600">
+                      2 rendiciones gratis
+                    </span>
                   ) : (
                     formatPrice(reimbursementFee)
                   ))}
@@ -109,26 +113,26 @@ export const Checkout = () => {
         </div>
 
         <div className="mb-6">
-          <div className="mb-4 flex items-start gap-3">
+          <label
+            htmlFor="insurance-checkbox"
+            className="mb-4 flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4 transition hover:bg-gray-50 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50"
+          >
             <input
               type="checkbox"
               id="insurance-checkbox"
               checked={isChecked}
               onChange={handleCheckboxChange}
-              className="mt-1 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-300 accent-blue-600"
+              className="mt-6 h-4 w-4 flex-shrink-0 cursor-pointer accent-purple-600"
             />
-            <label
-              htmlFor="insurance-checkbox"
-              className="flex cursor-pointer flex-col gap-1 text-sm text-gray-600"
-            >
+            <div className="flex flex-col gap-1.5">
               <Image
                 src={GokeiLogo as string}
                 alt="Skip Logo"
-                width={120}
-                height={120}
+                width={80}
+                height={80}
                 unoptimized
               />
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 text-sm text-gray-600">
                 Reembolsar automáticamente en mi isapre y seguro(s)
                 <TooltipProvider delayDuration={100}>
                   <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
@@ -152,8 +156,8 @@ export const Checkout = () => {
                   </Tooltip>
                 </TooltipProvider>
               </span>
-            </label>
-          </div>
+            </div>
+          </label>
 
           <div className="rounded-lg bg-gray-50 p-4">
             <div className="flex items-center gap-2 text-sm text-gray-600">
