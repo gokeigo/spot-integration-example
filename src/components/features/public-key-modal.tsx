@@ -5,13 +5,7 @@ import { usePublicKey } from "~/hooks/use-public-key";
 import { patientAtom } from "~/atoms/patient";
 import { patientPresetAtom } from "~/atoms/simulation-settings";
 import { useAtom } from "jotai";
-
-const NOT_REGISTERED_PRESET = {
-  name: "Natalia Gonzáléz",
-  rut: "75858230-2",
-  email: "spot@example.com",
-  phone_number: "+56 9 1234 5678",
-};
+import { generateNotRegisteredPatient } from "~/utils/generate-patient";
 
 const REGISTERED_PRESET = {
   name: "Natalia Becerra Morales",
@@ -66,7 +60,7 @@ export function PublicKeyModal() {
     setPublicKey(draftKey);
     const preset =
       draftPatientPreset === "not_registered"
-        ? NOT_REGISTERED_PRESET
+        ? generateNotRegisteredPatient()
         : REGISTERED_PRESET;
     setPatient((prev) => ({ ...prev, ...preset }));
     setPatientPreset(draftPatientPreset);

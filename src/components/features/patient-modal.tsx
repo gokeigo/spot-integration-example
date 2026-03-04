@@ -3,13 +3,7 @@ import { X, RotateCcw } from "lucide-react";
 import { useAtom } from "jotai";
 import { patientAtom } from "~/atoms/patient";
 import { showPatientModalAtom, patientPresetAtom } from "~/atoms/simulation-settings";
-
-const NOT_REGISTERED_DEFAULTS = {
-  name: "Natalia Gonzáléz",
-  rut: "75858230-2",
-  email: "spot@example.com",
-  phone_number: "+56 9 1234 5678",
-};
+import { generateNotRegisteredPatient } from "~/utils/generate-patient";
 
 const REGISTERED_DEFAULTS = {
   name: "Natalia Becerra Morales",
@@ -88,10 +82,9 @@ export function PatientModal() {
   const rutValidation = validateRut(draftRut);
   const showRutError = rutTouched && !rutValidation.valid;
 
-  const defaults =
-    patientPreset === "registered" ? REGISTERED_DEFAULTS : NOT_REGISTERED_DEFAULTS;
-
   const handleReset = () => {
+    const defaults =
+      patientPreset === "registered" ? REGISTERED_DEFAULTS : generateNotRegisteredPatient();
     setDraftName(defaults.name);
     setDraftEmail(defaults.email);
     setDraftRut(defaults.rut);
