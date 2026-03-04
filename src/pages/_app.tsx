@@ -2,6 +2,7 @@ import { GeistSans } from "geist/font/sans";
 import { type AppType } from "next/app";
 import { Provider } from "jotai";
 import { PublicKeyModal } from "~/components/features/public-key-modal";
+import { PatientModal } from "~/components/features/patient-modal";
 
 import "~/styles/globals.css";
 
@@ -11,6 +12,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <div className={GeistSans.className}>
         <Component {...pageProps} />
         <PublicKeyModal />
+        <PatientModal />
       </div>
     </Provider>
   );

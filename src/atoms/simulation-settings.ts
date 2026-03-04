@@ -1,9 +1,9 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { env } from "~/env";
 
 export const publicKeyAtom = atomWithStorage<string>("gokei-public-key", "");
 export const showModalAtom = atom<boolean>(true);
+export const showPatientModalAtom = atom<boolean>(false);
 export const integrationTypeAtom = atomWithStorage<string>(
   "gokei-integration-type",
   "modal",
@@ -11,4 +11,8 @@ export const integrationTypeAtom = atomWithStorage<string>(
 export const reimbursementFeeAtom = atomWithStorage<number>(
   "gokei-reimbursement-fee",
   1000,
+);
+export const patientPresetAtom = atomWithStorage<"not_registered" | "registered">(
+  "patient-preset",
+  "not_registered",
 );

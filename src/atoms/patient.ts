@@ -9,9 +9,9 @@ interface Patient {
 }
 
 export const patientAtom = atom<Patient>({
-  name: "Natalia Becerra Morales",
-  rut: "3367999-7",
-  email: "natalia@getgokei.com",
+  name: "Natalia Gonzáléz",
+  rut: "75858230-2",
+  email: "spot@example.com",
   phone_number: "+56 9 1234 5678",
   wantsReimbursement: false,
 });

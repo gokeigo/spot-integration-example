@@ -3,7 +3,22 @@ import { useRouter } from "next/router";
 import { X } from "lucide-react";
 import { usePublicKey } from "~/hooks/use-public-key";
 import { patientAtom } from "~/atoms/patient";
+import { patientPresetAtom } from "~/atoms/simulation-settings";
 import { useAtom } from "jotai";
+
+const NOT_REGISTERED_PRESET = {
+  name: "Natalia Gonzáléz",
+  rut: "75858230-2",
+  email: "spot@example.com",
+  phone_number: "+56 9 1234 5678",
+};
+
+const REGISTERED_PRESET = {
+  name: "Natalia Becerra Morales",
+  rut: "87839572-7",
+  email: "natalia@getgokei.com",
+  phone_number: "+56 9 1234 5678",
+};
 
 export function PublicKeyModal() {
   const {
@@ -18,11 +33,12 @@ export function PublicKeyModal() {
   } = usePublicKey();
   const router = useRouter();
   const [patient, setPatient] = useAtom(patientAtom);
-  const alreadyRegisteredRut = "3367999-7";
-  const notRegisteredRut = "11111111-k";
+  const [patientPreset, setPatientPreset] = useAtom(patientPresetAtom);
 
   const [draftKey, setDraftKey] = useState(publicKey);
-  const [draftPatientRut, setDraftPatientRut] = useState(patient.rut);
+  const [draftPatientPreset, setDraftPatientPreset] = useState<
+    "not_registered" | "registered"
+  >(patientPreset);
   const [draftIntegrationType, setDraftIntegrationType] =
     useState(integrationType);
   const [draftReimbursementFee, setDraftReimbursementFee] =
@@ -34,7 +50,7 @@ export function PublicKeyModal() {
   useEffect(() => {
     if (showModal) {
       setDraftKey(publicKey);
-      setDraftPatientRut(patient.rut);
+      setDraftPatientPreset(patientPreset);
       setDraftIntegrationType(integrationType);
       setDraftReimbursementFee(reimbursementFee === 0 ? 1000 : reimbursementFee);
       setDraftReimbursementMode(reimbursementFee === 0 ? "free_trial" : "paid");
@@ -42,13 +58,18 @@ export function PublicKeyModal() {
         void router.push("/");
       }
     }
-  }, [showModal, publicKey, patient.rut, integrationType, reimbursementFee]);
+  }, [showModal, publicKey, patientPreset, integrationType, reimbursementFee]);
 
   if (!showModal) return null;
 
   const handleSave = () => {
     setPublicKey(draftKey);
-    setPatient((prev) => ({ ...prev, rut: draftPatientRut }));
+    const preset =
+      draftPatientPreset === "not_registered"
+        ? NOT_REGISTERED_PRESET
+        : REGISTERED_PRESET;
+    setPatient((prev) => ({ ...prev, ...preset }));
+    setPatientPreset(draftPatientPreset);
     setintegrationType(draftIntegrationType);
     setReimbursementFee(
       draftReimbursementMode === "free_trial" ? 0 : draftReimbursementFee,
@@ -62,11 +83,11 @@ export function PublicKeyModal() {
       onClick={() => setShowModal(false)}
     >
       <div
-        className="flex w-full max-w-md flex-col gap-0 rounded-xl bg-white shadow-xl"
+        className="flex max-h-[90vh] w-full max-w-md flex-col rounded-xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-gray-100 px-6 py-5">
+        <div className="flex flex-shrink-0 items-start justify-between border-b border-gray-100 px-6 py-5">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
               Configuración del ejemplo
@@ -77,13 +98,13 @@ export function PublicKeyModal() {
           </div>
           <button
             onClick={() => setShowModal(false)}
-            className="ml-4 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+            className="ml-4 flex-shrink-0 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="flex flex-col gap-5 px-6 py-5">
+        <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-5">
           {/* Public key */}
           <section className="flex flex-col gap-1.5">
             <label
@@ -119,10 +140,9 @@ export function PublicKeyModal() {
               <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 transition hover:bg-gray-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                 <input
                   type="radio"
-                  id="patient-type-1"
                   name="patient-type"
-                  checked={draftPatientRut === alreadyRegisteredRut}
-                  onChange={() => setDraftPatientRut(alreadyRegisteredRut)}
+                  checked={draftPatientPreset === "not_registered"}
+                  onChange={() => setDraftPatientPreset("not_registered")}
                   className="accent-blue-600"
                 />
                 <span className="text-sm text-gray-700">
@@ -132,10 +152,9 @@ export function PublicKeyModal() {
               <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 transition hover:bg-gray-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                 <input
                   type="radio"
-                  id="patient-type-2"
                   name="patient-type"
-                  checked={draftPatientRut === notRegisteredRut}
-                  onChange={() => setDraftPatientRut(notRegisteredRut)}
+                  checked={draftPatientPreset === "registered"}
+                  onChange={() => setDraftPatientPreset("registered")}
                   className="accent-blue-600"
                 />
                 <span className="text-sm text-gray-700">
@@ -156,7 +175,6 @@ export function PublicKeyModal() {
               <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 transition hover:bg-gray-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                 <input
                   type="radio"
-                  id="simulation-type-1"
                   name="simulation-type"
                   checked={draftIntegrationType === "modal"}
                   onChange={() => setDraftIntegrationType("modal")}
@@ -167,7 +185,6 @@ export function PublicKeyModal() {
               <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 px-3 py-2.5 transition hover:bg-gray-50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                 <input
                   type="radio"
-                  id="simulation-type-2"
                   name="simulation-type"
                   checked={draftIntegrationType === "div"}
                   onChange={() => setDraftIntegrationType("div")}
@@ -235,7 +252,7 @@ export function PublicKeyModal() {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
+        <div className="flex flex-shrink-0 justify-end gap-2 border-t border-gray-100 px-6 py-4">
           <button
             onClick={() => setShowModal(false)}
             className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
