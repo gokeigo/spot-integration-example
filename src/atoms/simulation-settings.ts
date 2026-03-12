@@ -16,3 +16,8 @@ export const patientPresetAtom = atomWithStorage<"not_registered" | "registered"
   "patient-preset",
   "not_registered",
 );
+export const workflowTypeAtom = atomWithStorage<"standard" | "cnpl">(
+  "workflow-type",
+  "standard",
+);
+export const clientSecretAtom = atomWithStorage<string>("skipay-client-secret", "");

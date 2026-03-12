@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { publicKeyAtom, showModalAtom, integrationTypeAtom, reimbursementFeeAtom } from "~/atoms/simulation-settings";
+import { publicKeyAtom, showModalAtom, integrationTypeAtom, reimbursementFeeAtom, workflowTypeAtom, clientSecretAtom } from "~/atoms/simulation-settings";
 import { env } from "~/env";
 
 export function usePublicKey() {
@@ -7,6 +7,8 @@ export function usePublicKey() {
   const [publicKey, setPublicKey] = useAtom(publicKeyAtom);
   const [showModal, setShowModal] = useAtom(showModalAtom);
   const [reimbursementFee, setReimbursementFee] = useAtom(reimbursementFeeAtom);
+  const [workflowType, setWorkflowType] = useAtom(workflowTypeAtom);
+  const [clientSecret, setClientSecret] = useAtom(clientSecretAtom);
 
   return {
     integrationType,
@@ -17,5 +19,9 @@ export function usePublicKey() {
     setShowModal,
     reimbursementFee,
     setReimbursementFee,
+    workflowType,
+    setWorkflowType,
+    clientSecret,
+    setClientSecret,
   };
 }
