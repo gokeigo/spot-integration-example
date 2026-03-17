@@ -13,16 +13,15 @@ import DivIframe from "./div-iframe";
 import { type GokeiWidgetResponse } from "~/types/gokei-spot";
 import { type CreateOrderResponse } from "~/pages/api/create-order";
 
-const BASE_AMOUNT = 80000;
-
 async function createOrder(
   clientSecret: string,
   patient: { name: string; rut: string; email: string; phone_number: string },
+  totalAmount: number,
 ): Promise<string> {
   const response = await fetch("/api/create-order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ clientSecret, patient, totalAmount: BASE_AMOUNT }),
+    body: JSON.stringify({ clientSecret, patient, totalAmount }),
   });
   const body = (await response.json()) as CreateOrderResponse & { error?: string; detail?: string };
   if (!response.ok) {
@@ -36,7 +35,7 @@ function AppointmentConfirmation() {
   const [patient] = useAtom(patientAtom);
   const [widgetUrl, setWidgetUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { integrationType, publicKey, workflowType, clientSecret } = usePublicKey();
+  const { integrationType, publicKey, workflowType, clientSecret, consultaCosto } = usePublicKey();
 
   useEffect(() => {
     const initializeGokeiWidget = async () => {
@@ -50,7 +49,7 @@ function AppointmentConfirmation() {
 
         let orderToken: string | undefined;
         if (isCnpl) {
-          orderToken = await createOrder(clientSecret, patient);
+          orderToken = await createOrder(clientSecret, patient, consultaCosto);
         }
 
         const response = await fetch(

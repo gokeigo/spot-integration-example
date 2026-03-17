@@ -21,3 +21,5 @@ export const workflowTypeAtom = atomWithStorage<"standard" | "cnpl">(
   "standard",
 );
 export const clientSecretAtom = atomWithStorage<string>("skipay-client-secret", "");
+export const cnplSkipCommissionPercentAtom = atomWithStorage<number>("cnpl-skip-commission-percent", 7);
+export const consultaCostoAtom = atomWithStorage<number>("consulta-costo", 14000);

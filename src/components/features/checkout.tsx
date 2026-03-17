@@ -18,7 +18,7 @@ import { usePublicKey } from "~/hooks/use-public-key";
 
 export const Checkout = () => {
   const [patient, setPatient] = useAtom(patientAtom);
-  const { publicKey, reimbursementFee, workflowType } = usePublicKey();
+  const { publicKey, reimbursementFee, workflowType, cnplSkipCommissionPercent, consultaCosto } = usePublicKey();
   const [isChecked, setIsChecked] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,16 +26,16 @@ export const Checkout = () => {
     undefined,
   );
 
-  const basePrice = 75000;
+  const basePrice = consultaCosto;
   const platformFee = 5000;
   const isCnpl = workflowType === "cnpl";
 
   const cnplPayNow = Math.round(basePrice * 0.3);
-  const cnplCommission = Math.round(basePrice * 0.7 * 0.07);
+  const cnplCommission = Math.round(basePrice * cnplSkipCommissionPercent / 100);
 
   const calculateTotal = () => {
     if (isCnpl) {
-      return cnplPayNow + platformFee + cnplCommission;
+      return cnplPayNow + cnplCommission;
     }
     let total = basePrice + platformFee;
     if (isChecked && isSubscribed === false) {
@@ -91,11 +91,7 @@ export const Checkout = () => {
                 <span className="text-lg font-semibold text-blue-600">{formatPrice(cnplPayNow)}</span>
               </div>
               <div className="flex justify-between border-b border-gray-100 py-2">
-                <span className="text-xs text-gray-400">Cargo de Plataforma</span>
-                <span className="text-xs text-gray-400">{formatPrice(platformFee)}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-100 py-2">
-                <span className="text-xs text-gray-400">Comisión Skip (7% del reembolso)</span>
+                <span className="text-xs text-gray-400">Comisión Skip ({cnplSkipCommissionPercent}%)</span>
                 <span className="text-xs text-gray-400">{formatPrice(cnplCommission)}</span>
               </div>
             </>
@@ -155,7 +151,7 @@ export const Checkout = () => {
                 />
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-medium text-purple-800">
-                    Care Now Pay Later
+                    Atiéndete Ahora y Paga Después
                   </span>
                   <span className="text-sm text-purple-700">
                     Pagas el 30% ahora. El 70% restante lo pagas cuando tu isapre

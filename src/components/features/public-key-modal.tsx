@@ -56,6 +56,10 @@ export function PublicKeyModal() {
     setWorkflowType,
     clientSecret,
     setClientSecret,
+    cnplSkipCommissionPercent,
+    setCnplSkipCommissionPercent,
+    consultaCosto,
+    setConsultaCosto,
   } = usePublicKey();
   const router = useRouter();
   const [, setPatient] = useAtom(patientAtom);
@@ -71,6 +75,8 @@ export function PublicKeyModal() {
   const [draftReimbursementMode, setDraftReimbursementMode] = useState<"free_trial" | "paid">(
     reimbursementFee === 0 ? "free_trial" : "paid",
   );
+  const [draftCnplSkipCommissionPercent, setDraftCnplSkipCommissionPercent] = useState(cnplSkipCommissionPercent);
+  const [draftConsultaCosto, setDraftConsultaCosto] = useState(consultaCosto);
 
   useEffect(() => {
     if (showModal) {
@@ -81,11 +87,13 @@ export function PublicKeyModal() {
       setDraftIntegrationType(integrationType);
       setDraftReimbursementFee(reimbursementFee === 0 ? 1000 : reimbursementFee);
       setDraftReimbursementMode(reimbursementFee === 0 ? "free_trial" : "paid");
+      setDraftCnplSkipCommissionPercent(cnplSkipCommissionPercent);
+      setDraftConsultaCosto(consultaCosto);
       if (router.pathname !== "/") {
         void router.push("/");
       }
     }
-  }, [showModal, workflowType, publicKey, clientSecret, patientPreset, integrationType, reimbursementFee]);
+  }, [showModal, workflowType, publicKey, clientSecret, patientPreset, integrationType, reimbursementFee, cnplSkipCommissionPercent, consultaCosto]);
 
   if (!showModal) return null;
 
@@ -106,6 +114,8 @@ export function PublicKeyModal() {
     setintegrationType(draftIntegrationType);
     setReimbursementFee(draftReimbursementMode === "free_trial" ? 0 : draftReimbursementFee);
     setWorkflowType(draftWorkflowType);
+    setCnplSkipCommissionPercent(draftCnplSkipCommissionPercent);
+    setConsultaCosto(draftConsultaCosto);
     setShowModal(false);
   };
 
@@ -165,12 +175,12 @@ export function PublicKeyModal() {
                 />
                 <div className="flex flex-col">
                   <span className="flex items-center gap-2 text-sm text-gray-700">
-                    CNPL
+                    AAPD
                     <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
-                      Care Now Pay Later
+                      Atiéndete Ahora y Paga Después
                     </span>
                   </span>
-                  <span className="text-xs text-gray-400">Pago diferido — la clínica paga ahora, el paciente paga después</span>
+                  <span className="text-xs text-gray-400">El paciente paga 30% de la boleta y el resto con el reembolso</span>
                 </div>
               </label>
             </div>
@@ -228,6 +238,46 @@ export function PublicKeyModal() {
               </div>
               {isSecretMissing && <p className="text-xs text-red-500">Este campo es obligatorio para el flujo CNPL.</p>}
             </section>
+          )}
+
+          {/* Skip commission % and Costo Consulta (CNPL only) */}
+          {isCnpl && (
+            <>
+              <section className="flex flex-col gap-1.5">
+                <label htmlFor="cnpl-commission-input" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  Comisión Skip (% del costo de consulta)
+                  <InfoTooltip text="Porcentaje que Skip cobra sobre el costo de consulta en el flujo Atiéndete Ahora y Paga Después." />
+                </label>
+                <div className="relative">
+                  <input
+                    id="cnpl-commission-input"
+                    type="number"
+                    value={draftCnplSkipCommissionPercent}
+                    onChange={(e) => setDraftCnplSkipCommissionPercent(Number(e.target.value))}
+                    min={0}
+                    max={100}
+                    step={0.1}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 pr-8 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span>
+                </div>
+              </section>
+
+              <section className="flex flex-col gap-1.5">
+                <label htmlFor="consulta-costo-input" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  Costo Consulta (CLP)
+                  <InfoTooltip text="Monto de la consulta. Se usa para calcular el cobro en el checkout y como monto de la orden CNPL." />
+                </label>
+                <input
+                  id="consulta-costo-input"
+                  type="number"
+                  value={draftConsultaCosto}
+                  onChange={(e) => setDraftConsultaCosto(Number(e.target.value))}
+                  min={1}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                />
+              </section>
+            </>
           )}
 
           <div className="border-t border-gray-100" />
