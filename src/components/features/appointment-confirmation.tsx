@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import SuccessHeader from "~/components/ui/success/success-header";
 import AppointmentDetails from "~/components/ui/success/appointment-details";
@@ -17,10 +17,12 @@ async function createOrder(
   clientSecret: string,
   patient: { name: string; rut: string; email: string; phone_number: string },
   totalAmount: number,
+  signal?: AbortSignal,
 ): Promise<string> {
   const response = await fetch("/api/create-order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    signal,
     body: JSON.stringify({ clientSecret, patient, totalAmount }),
   });
   const body = (await response.json()) as CreateOrderResponse & { error?: string; detail?: string };
@@ -36,60 +38,107 @@ function AppointmentConfirmation() {
   const [widgetUrl, setWidgetUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { integrationType, publicKey, workflowType, clientSecret, consultaCosto } = usePublicKey();
+  const hasInitialized = useRef(false);
+
+  // Stable primitives extracted from patient to avoid object-reference churn
+  const patientRut = patient.rut;
+  const patientName = patient.name;
+  const patientEmail = patient.email;
+  const patientPhone = patient.phone_number;
+  const patientWantsReimbursement = patient.wantsReimbursement;
 
   useEffect(() => {
-    const initializeGokeiWidget = async () => {
-      const isCnpl = workflowType === "cnpl";
-      if (!patient.wantsReimbursement && !isCnpl) return;
+    const isCnpl = workflowType === "cnpl";
+    if (!patientWantsReimbursement && !isCnpl) return;
 
+    // ⚠️ These guards MUST come before the hasInitialized check.
+    // On SSR, atomWithStorage atoms have empty defaults. The guards return early
+    // (without setting the flag) so that when hydration updates the atoms with
+    // real values, the effect re-fires and proceeds correctly.
+    if (!publicKey) return;
+    if (isCnpl && !clientSecret) return;
+
+    // Single-run guard: prevent double-init from Strict Mode or hydration re-renders
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    const abortController = new AbortController();
+
+    const initializeGokeiWidget = async () => {
       try {
-        const nameParts = patient.name.split(" ");
+        const nameParts = patientName.split(" ");
         const surname = nameParts.slice(1).join(" ");
         const firstName = nameParts[0] ?? "";
 
-        let orderToken: string | undefined;
-        if (isCnpl) {
-          orderToken = await createOrder(clientSecret, patient, consultaCosto);
-        }
+        const patientData = {
+          name: patientName,
+          rut: patientRut,
+          email: patientEmail,
+          phone_number: patientPhone,
+        };
 
-        const response = await fetch(
-          `${env.NEXT_PUBLIC_GOKEI_API_URL}/widget?public_key=${publicKey}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+        // Parallelize: createOrder (CNPL only) and fetchWidgetToken are independent.
+        // Note: if createOrder throws (e.g. SkipPay 4xx), Promise.all rejects and
+        // the widget fetch is also abandoned — same behavior as the original sequential code.
+        const [orderToken, widgetData] = await Promise.all([
+          isCnpl
+            ? createOrder(clientSecret, patientData, consultaCosto, abortController.signal)
+            : Promise.resolve(undefined),
+          fetch(
+            `${env.NEXT_PUBLIC_GOKEI_API_URL}/widget?public_key=${publicKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              signal: abortController.signal,
+              body: JSON.stringify({
+                rut: patientRut,
+                user_data: {
+                  name: firstName,
+                  surname,
+                  rut: patientRut,
+                  email: patientEmail,
+                  phone_number: patientPhone,
+                },
+              }),
             },
-            body: JSON.stringify({
-              rut: patient.rut,
-              user_data: {
-                name: firstName,
-                surname,
-                rut: patient.rut,
-                email: patient.email,
-                phone_number: patient.phone_number,
-              },
-            }),
-          },
-        );
+          ).then(async (res) => {
+            if (!res.ok) throw new Error(`Widget fetch failed (${res.status})`);
+            return res.json() as Promise<GokeiWidgetResponse>;
+          }),
+        ]);
 
-        if (response.ok) {
-          const data = (await response.json()) as GokeiWidgetResponse;
-          console.log("Gokei widget initialized:", data);
-          const url = orderToken
-            ? `${data.url}&order_token=${orderToken}`
-            : data.url;
-          setWidgetUrl(url);
-          setIsModalOpen(true);
-        } else {
-          console.error("Failed to initialize Gokei widget");
-        }
+        if (abortController.signal.aborted) return;
+
+        const url = orderToken
+          ? `${widgetData.url}&order_token=${orderToken}`
+          : widgetData.url;
+
+        setWidgetUrl(url);
+        setIsModalOpen(true);
       } catch (error) {
+        if ((error as { name?: string }).name === "AbortError") return;
         console.error("Error initializing Gokei widget:", error);
       }
     };
 
     void initializeGokeiWidget();
-  }, [patient, publicKey, workflowType]);
+
+    return () => {
+      abortController.abort();
+      // Reset guard on unmount so a fresh mount (e.g., navigating back) re-initializes
+      hasInitialized.current = false;
+    };
+  }, [
+    patientWantsReimbursement,
+    patientRut,
+    patientName,
+    patientEmail,
+    patientPhone,
+    publicKey,
+    workflowType,
+    clientSecret,
+    consultaCosto,
+  ]);
 
   const isCnpl = workflowType === "cnpl";
   const showWidget = patient.wantsReimbursement || isCnpl;
