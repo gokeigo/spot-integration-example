@@ -8,6 +8,8 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    SKIPPAY_API_URL: z.string().url().optional(),
+    SKIPAY_CLIENT_SECRET: z.string().optional(),
   },
 
   /**
@@ -30,6 +32,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    SKIPPAY_API_URL: process.env.SKIPPAY_API_URL,
+    SKIPAY_CLIENT_SECRET: process.env.SKIPAY_CLIENT_SECRET,
     NEXT_PUBLIC_GOKEI_API_URL: process.env.NEXT_PUBLIC_GOKEI_API_URL,
     NEXT_PUBLIC_GOKEI_WIDGET_URL: process.env.NEXT_PUBLIC_GOKEI_WIDGET_URL,
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: process.env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY,
