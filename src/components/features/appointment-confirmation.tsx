@@ -11,7 +11,6 @@ import { usePublicKey } from "~/hooks/use-public-key";
 import { PiggyBank, AlertTriangle, Settings } from "lucide-react";
 import DivIframe from "./div-iframe";
 import { type GokeiWidgetResponse } from "~/types/gokei-spot";
-import { type CreateOrderResponse } from "~/pages/api/create-order";
 import { showModalAtom } from "~/atoms/simulation-settings";
 
 async function createOrder(
@@ -26,7 +25,7 @@ async function createOrder(
     signal,
     body: JSON.stringify({ clientSecret, patient, totalAmount }),
   });
-  const body = (await response.json()) as CreateOrderResponse & { error?: string; detail?: string };
+  const body = (await response.json()) as { hash: string; error?: string; detail?: string | unknown[] };
   if (!response.ok) {
     const detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
     throw new Error(`Failed to create order (${response.status}): ${detail ?? body.error ?? "unknown"}`);
@@ -144,6 +143,7 @@ function AppointmentConfirmation() {
   ]);
 
   const isCnpl = workflowType === "cnpl";
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const showWidget = patient.wantsReimbursement || isCnpl;
 
   const errorBanner = widgetError && (

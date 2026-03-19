@@ -48,4 +48,4 @@ yarn-error.log*
 # git worktrees
 .worktrees
 
-docs
+docs.dev.vars
