@@ -22,6 +22,7 @@ export const env = createEnv({
       .string()
       .optional()
       .transform((val) => (val === "PK_EXAMPLE" ? undefined : val)),
+    NEXT_PUBLIC_SKIPPAY_API_URL: z.string().url().optional(),
   },
 
   /**
@@ -33,6 +34,7 @@ export const env = createEnv({
     NEXT_PUBLIC_GOKEI_API_URL: process.env.NEXT_PUBLIC_GOKEI_API_URL,
     NEXT_PUBLIC_GOKEI_WIDGET_URL: process.env.NEXT_PUBLIC_GOKEI_WIDGET_URL,
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: process.env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY,
+    NEXT_PUBLIC_SKIPPAY_API_URL: process.env.NEXT_PUBLIC_SKIPPAY_API_URL,
   },
 
   /**

@@ -14,16 +14,34 @@ import { type GokeiWidgetResponse } from "~/types/gokei-spot";
 import { showModalAtom } from "~/atoms/simulation-settings";
 
 async function createOrder(
+  skippayApiUrl: string,
   clientSecret: string,
   patient: { name: string; rut: string; email: string; phone_number: string },
   totalAmount: number,
   signal?: AbortSignal,
 ): Promise<string> {
-  const response = await fetch("/api/create-order", {
+  const nameParts = patient.name.split(" ");
+  const firstName = nameParts[0] ?? "";
+  const lastName = nameParts.slice(1).join(" ");
+
+  const response = await fetch(`${skippayApiUrl}/orders`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${clientSecret}`,
+    },
     signal,
-    body: JSON.stringify({ clientSecret, patient, totalAmount }),
+    body: JSON.stringify({
+      reference: `ORDER-${Date.now()}`,
+      total_amount: String(totalAmount),
+      customer: {
+        rut: patient.rut,
+        first_name: firstName,
+        last_name: lastName,
+        email: patient.email,
+        phone_number: patient.phone_number,
+      },
+    }),
   });
   const body = (await response.json()) as { hash: string; error?: string; detail?: string | unknown[] };
   if (!response.ok) {
@@ -59,6 +77,7 @@ function AppointmentConfirmation() {
     // real values, the effect re-fires and proceeds correctly.
     if (!publicKey) return;
     if (isCnpl && !clientSecret) return;
+    if (isCnpl && !env.NEXT_PUBLIC_SKIPPAY_API_URL) return;
 
     // Single-run guard: prevent double-init from Strict Mode or hydration re-renders
     if (hasInitialized.current) return;
@@ -84,7 +103,7 @@ function AppointmentConfirmation() {
         // the widget fetch is also abandoned — same behavior as the original sequential code.
         const [orderToken, widgetData] = await Promise.all([
           isCnpl
-            ? createOrder(clientSecret, patientData, consultaCosto, abortController.signal)
+            ? createOrder(env.NEXT_PUBLIC_SKIPPAY_API_URL!, clientSecret, patientData, consultaCosto, abortController.signal)
             : Promise.resolve(undefined),
           fetch(
             `${env.NEXT_PUBLIC_GOKEI_API_URL}/widget?public_key=${publicKey}`,
