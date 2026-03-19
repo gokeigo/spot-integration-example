@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { X, Info, Eye, EyeOff } from "lucide-react";
 import { usePublicKey } from "~/hooks/use-public-key";
@@ -78,22 +78,30 @@ export function PublicKeyModal() {
   const [draftCnplSkipCommissionPercent, setDraftCnplSkipCommissionPercent] = useState(cnplSkipCommissionPercent);
   const [draftConsultaCosto, setDraftConsultaCosto] = useState(consultaCosto);
 
+  const prevShowModalRef = useRef(false);
+
+  const routerPathname = router.pathname;
+
   useEffect(() => {
-    if (showModal) {
-      setDraftWorkflowType(workflowType);
-      setDraftKey(publicKey ?? "");
-      setDraftClientSecret(clientSecret);
-      setDraftPatientPreset(patientPreset);
-      setDraftIntegrationType(integrationType);
-      setDraftReimbursementFee(reimbursementFee === 0 ? 1000 : reimbursementFee);
-      setDraftReimbursementMode(reimbursementFee === 0 ? "free_trial" : "paid");
-      setDraftCnplSkipCommissionPercent(cnplSkipCommissionPercent);
-      setDraftConsultaCosto(consultaCosto);
-      if (router.pathname !== "/") {
-        void router.push("/");
-      }
+    const justOpened = showModal && !prevShowModalRef.current;
+    prevShowModalRef.current = showModal;
+
+    if (!justOpened) return;
+
+    setDraftWorkflowType(workflowType);
+    setDraftKey(publicKey ?? "");
+    setDraftClientSecret(clientSecret);
+    setDraftPatientPreset(patientPreset);
+    setDraftIntegrationType(integrationType);
+    setDraftReimbursementFee(reimbursementFee === 0 ? 1000 : reimbursementFee);
+    setDraftReimbursementMode(reimbursementFee === 0 ? "free_trial" : "paid");
+    setDraftCnplSkipCommissionPercent(cnplSkipCommissionPercent);
+    setDraftConsultaCosto(consultaCosto);
+
+    if (routerPathname !== "/") {
+      void router.push("/");
     }
-  }, [showModal, workflowType, publicKey, clientSecret, patientPreset, integrationType, reimbursementFee, cnplSkipCommissionPercent, consultaCosto]);
+  }, [showModal, workflowType, publicKey, clientSecret, patientPreset, integrationType, reimbursementFee, cnplSkipCommissionPercent, consultaCosto, routerPathname]);
 
   if (!showModal) return null;
 
