@@ -8,10 +8,11 @@ import { patientAtom } from "~/atoms/patient";
 import { env } from "~/env";
 import ModalIframe from "./modal-iframe";
 import { usePublicKey } from "~/hooks/use-public-key";
-import { PiggyBank } from "lucide-react";
+import { PiggyBank, AlertTriangle, Settings } from "lucide-react";
 import DivIframe from "./div-iframe";
 import { type GokeiWidgetResponse } from "~/types/gokei-spot";
 import { type CreateOrderResponse } from "~/pages/api/create-order";
+import { showModalAtom } from "~/atoms/simulation-settings";
 
 async function createOrder(
   clientSecret: string,
@@ -27,8 +28,8 @@ async function createOrder(
   });
   const body = (await response.json()) as CreateOrderResponse & { error?: string; detail?: string };
   if (!response.ok) {
-    console.error("[create-order] failed", response.status, body);
-    throw new Error(`Failed to create order (${response.status}): ${body.detail ?? body.error ?? "unknown"}`);
+    const detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
+    throw new Error(`Failed to create order (${response.status}): ${detail ?? body.error ?? "unknown"}`);
   }
   return body.hash;
 }
@@ -37,6 +38,8 @@ function AppointmentConfirmation() {
   const [patient] = useAtom(patientAtom);
   const [widgetUrl, setWidgetUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [widgetError, setWidgetError] = useState<string | null>(null);
+  const [, setShowSettingsModal] = useAtom(showModalAtom);
   const { integrationType, publicKey, workflowType, clientSecret, consultaCosto } = usePublicKey();
   const hasInitialized = useRef(false);
 
@@ -117,7 +120,7 @@ function AppointmentConfirmation() {
         setIsModalOpen(true);
       } catch (error) {
         if ((error as { name?: string }).name === "AbortError") return;
-        console.error("Error initializing Gokei widget:", error);
+        setWidgetError(error instanceof Error ? error.message : "Error desconocido al inicializar el widget");
       }
     };
 
@@ -143,6 +146,25 @@ function AppointmentConfirmation() {
   const isCnpl = workflowType === "cnpl";
   const showWidget = patient.wantsReimbursement || isCnpl;
 
+  const errorBanner = widgetError && (
+    <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" />
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-red-800">Error al inicializar el widget</p>
+          <p className="font-mono text-xs text-red-600">{widgetError}</p>
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="flex w-fit items-center gap-1.5 rounded-lg bg-red-100 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-200"
+          >
+            <Settings className="h-3.5 w-3.5" />
+            Abrir configuración
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   if (integrationType === "div") {
     return (
       <div className="min-h-screen p-6">
@@ -150,7 +172,8 @@ function AppointmentConfirmation() {
           <div className="space-y-8 rounded-2xl bg-white p-8 shadow-xl">
             <SuccessHeader />
             <AppointmentDetails />
-            {showWidget && <DivIframe url={widgetUrl ?? ""} />}
+            {errorBanner}
+            {showWidget && !widgetError && <DivIframe url={widgetUrl ?? ""} />}
             <NextSteps />
             <ActionButtons />
             <p className="mt-6 text-center text-gray-500">
@@ -170,7 +193,8 @@ function AppointmentConfirmation() {
           <div className="space-y-8 rounded-2xl bg-white p-8 shadow-xl">
             <SuccessHeader />
             <AppointmentDetails />
-            {patient.wantsReimbursement && !isCnpl && (
+            {errorBanner}
+            {patient.wantsReimbursement && !isCnpl && !widgetError && (
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"
