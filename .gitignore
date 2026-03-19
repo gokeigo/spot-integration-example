@@ -45,4 +45,7 @@ yarn-error.log*
 # idea files
 .idea
 
+# git worktrees
+.worktrees
+
 docs
