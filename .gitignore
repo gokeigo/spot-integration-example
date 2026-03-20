@@ -49,3 +49,6 @@ yarn-error.log*
 .worktrees
 
 docs.dev.vars
+docs/*
+.claude
+.workflows
