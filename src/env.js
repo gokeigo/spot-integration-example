@@ -8,8 +8,6 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
-    SKIPPAY_API_URL: z.string().url().optional(),
-    SKIPAY_CLIENT_SECRET: z.string().optional(),
   },
 
   /**
@@ -24,6 +22,7 @@ export const env = createEnv({
       .string()
       .optional()
       .transform((val) => (val === "PK_EXAMPLE" ? undefined : val)),
+    NEXT_PUBLIC_SKIPPAY_API_URL: z.string().url().optional(),
   },
 
   /**
@@ -32,20 +31,26 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
-    SKIPPAY_API_URL: process.env.SKIPPAY_API_URL,
-    SKIPAY_CLIENT_SECRET: process.env.SKIPAY_CLIENT_SECRET,
     NEXT_PUBLIC_GOKEI_API_URL: process.env.NEXT_PUBLIC_GOKEI_API_URL,
     NEXT_PUBLIC_GOKEI_WIDGET_URL: process.env.NEXT_PUBLIC_GOKEI_WIDGET_URL,
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: process.env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY,
+    NEXT_PUBLIC_SKIPPAY_API_URL: process.env.NEXT_PUBLIC_SKIPPAY_API_URL,
   },
+
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
    * useful for Docker builds.
    */
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
+
   /**
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
+   *
+   * SKIPPAY_API_URL and SKIPAY_CLIENT_SECRET are intentionally absent from this schema.
+   * They are server-side secrets used exclusively by the Cloudflare Pages Function at
+   * functions/api/create-order.ts and must be configured in the Cloudflare Pages dashboard
+   * under Settings > Environment Variables (not here at build time).
    */
   emptyStringAsUndefined: true,
 });

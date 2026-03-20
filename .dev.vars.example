@@ -1,0 +1,5 @@
+# .dev.vars.example — copy to .dev.vars for local wrangler pages dev
+# This file is the Cloudflare equivalent of .env for Pages Functions.
+# .dev.vars is read automatically by `wrangler pages dev` and is NOT committed to git.
+# Currently unused: the app calls SkipPay directly via NEXT_PUBLIC_SKIPPAY_API_URL.
+# Kept for reference if a server-side proxy is added to functions/ in the future.
