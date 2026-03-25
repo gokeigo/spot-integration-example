@@ -40,12 +40,23 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     );
   }
 
-  const result = await createSkipPayOrder({
-    apiUrl: env.NEXT_PUBLIC_SKIP_PAY_API,
-    clientSecret,
-    patient,
-    totalAmount,
-  });
+  let result;
+  try {
+    result = await createSkipPayOrder({
+      apiUrl: env.NEXT_PUBLIC_SKIP_PAY_API,
+      clientSecret,
+      patient,
+      totalAmount,
+    });
+  } catch (error) {
+    return Response.json(
+      {
+        error: "Unexpected error while creating order",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
+  }
 
   if (!result.ok) {
     return Response.json(

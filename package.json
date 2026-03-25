@@ -10,8 +10,8 @@
     "dev:pages": "wrangler pages dev --proxy 3000 --port 3001 --compatibility-date 2024-09-23",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "preview": "next build && next start -p 3001",
-    "start": "next start -p 3001",
+    "preview": "pnpm build && wrangler pages dev out --port 3001 --compatibility-date 2024-09-23",
+    "start": "wrangler pages dev out --port 3001 --compatibility-date 2024-09-23",
     "typecheck": "tsc --noEmit",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache"

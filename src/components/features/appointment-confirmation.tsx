@@ -19,17 +19,39 @@ async function createOrder(
   clientSecret?: string,
   signal?: AbortSignal,
 ): Promise<string> {
+  const trimmedClientSecret = clientSecret?.trim();
+
+  const parseErrorBody = async (response: Response) => {
+    const text = await response.text();
+    if (!text) return undefined;
+
+    try {
+      const parsed = JSON.parse(text) as { error?: string; detail?: string | unknown[] };
+      return typeof parsed.detail === "string"
+        ? parsed.detail
+        : parsed.detail
+          ? JSON.stringify(parsed.detail)
+          : parsed.error;
+    } catch {
+      return text;
+    }
+  };
+
   const response = await fetch(`/api/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     signal,
-    body: JSON.stringify({ patient, totalAmount, clientSecret }),
+    body: JSON.stringify({ patient, totalAmount, clientSecret: trimmedClientSecret }),
   });
-  const body = (await response.json()) as { hash: string; error?: string; detail?: string | unknown[] };
+
   if (!response.ok) {
-    const detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
-    throw new Error(`Failed to create order (${response.status}): ${detail ?? body.error ?? "unknown"}`);
+    const detail = await parseErrorBody(response);
+    throw new Error(
+      `Failed to create order via API route (${response.status}): ${detail ?? "unknown"}`,
+    );
   }
+
+  const body = (await response.json()) as { hash: string };
   return body.hash;
 }
 
@@ -41,6 +63,7 @@ function AppointmentConfirmation() {
   const [, setShowSettingsModal] = useAtom(showModalAtom);
   const { integrationType, publicKey, workflowType, clientSecret, consultaCosto } = usePublicKey();
   const hasInitialized = useRef(false);
+  const trimmedClientSecret = clientSecret.trim();
 
   // Stable primitives extracted from patient to avoid object-reference churn
   const patientRut = patient.rut;
@@ -58,6 +81,7 @@ function AppointmentConfirmation() {
     // (without setting the flag) so that when hydration updates the atoms with
     // real values, the effect re-fires and proceeds correctly.
     if (!publicKey) return;
+    if (isCnpl && !trimmedClientSecret) return;
 
     // Single-run guard: prevent double-init from Strict Mode or hydration re-renders
     if (hasInitialized.current) return;
@@ -86,7 +110,7 @@ function AppointmentConfirmation() {
             ? createOrder(
                 patientData,
                 consultaCosto,
-                clientSecret || undefined,
+                trimmedClientSecret || undefined,
                 abortController.signal,
               )
             : Promise.resolve(undefined),
@@ -142,7 +166,7 @@ function AppointmentConfirmation() {
     patientPhone,
     publicKey,
     workflowType,
-    clientSecret,
+    trimmedClientSecret,
     consultaCosto,
   ]);
 
