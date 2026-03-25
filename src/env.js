@@ -22,7 +22,6 @@ export const env = createEnv({
       .string()
       .optional()
       .transform((val) => (val === "PK_EXAMPLE" ? undefined : val)),
-    NEXT_PUBLIC_SKIPPAY_API_URL: z.string().url().optional(),
   },
 
   /**
@@ -34,7 +33,6 @@ export const env = createEnv({
     NEXT_PUBLIC_GOKEI_API_URL: process.env.NEXT_PUBLIC_GOKEI_API_URL,
     NEXT_PUBLIC_GOKEI_WIDGET_URL: process.env.NEXT_PUBLIC_GOKEI_WIDGET_URL,
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: process.env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY,
-    NEXT_PUBLIC_SKIPPAY_API_URL: process.env.NEXT_PUBLIC_SKIPPAY_API_URL,
   },
 
   /**
@@ -47,10 +45,9 @@ export const env = createEnv({
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
    *
-   * SKIPPAY_API_URL and SKIPAY_CLIENT_SECRET are intentionally absent from this schema.
-   * They are server-side secrets used exclusively by the Cloudflare Pages Function at
-   * functions/api/create-order.ts and must be configured in the Cloudflare Pages dashboard
-   * under Settings > Environment Variables (not here at build time).
+   * SKIP_PAY_API and SKIPAY_CLIENT_SECRET are intentionally absent from this schema.
+   * They are server-side secrets used by the order-creation handlers in
+   * src/pages/api/create-order.ts and functions/api/create-order.ts.
    */
   emptyStringAsUndefined: true,
 });

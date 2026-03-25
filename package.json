@@ -6,7 +6,8 @@
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
-    "dev": "next dev --turbo -p 3001",
+    "dev": "next dev --turbo -p 3000",
+    "dev:pages": "wrangler pages dev --proxy 3000 --port 3001 --compatibility-date 2024-09-23",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start -p 3001",
@@ -45,10 +46,14 @@
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.8",
     "tailwindcss": "^3.4.14",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "wrangler": "^4.75.0"
   },
   "ct3aMetadata": {
     "initVersion": "7.38.1"
+  },
+  "engines": {
+    "node": ">=18.18.0"
   },
   "packageManager": "pnpm@9.6.0"
 }

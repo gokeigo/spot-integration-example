@@ -1,26 +1,12 @@
 import type { PagesFunction } from "@cloudflare/workers-types";
+import {
+  createSkipPayOrder,
+  type CreateOrderRequestBody,
+} from "../../src/server/create-order";
 
 interface Env {
-  SKIPPAY_API_URL?: string;
+  SKIP_PAY_API?: string;
   SKIPAY_CLIENT_SECRET?: string;
-}
-
-interface CreateOrderRequestBody {
-  clientSecret?: string;
-  patient: {
-    name: string;
-    rut: string;
-    email: string;
-    phone_number: string;
-  };
-  totalAmount: number;
-}
-
-export interface CreateOrderResponse {
-  hash: string;
-  reference: string;
-  status: string;
-  total_amount: string;
 }
 
 export const onRequest: PagesFunction<Env> = async (context) => {
@@ -30,9 +16,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
-  if (!env.SKIPPAY_API_URL) {
+  if (!env.SKIP_PAY_API) {
     return Response.json(
-      { error: "SKIPPAY_API_URL is not configured" },
+      { error: "SKIP_PAY_API is not configured" },
       { status: 500 },
     );
   }
@@ -54,54 +40,19 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     );
   }
 
-  const nameParts = patient.name.split(" ");
-  const firstName = nameParts[0] ?? "";
-  const lastName = nameParts.slice(1).join(" ");
-
-  const requestBody = {
-    reference: `ORDER-${Date.now()}`,
-    total_amount: String(totalAmount),
-    customer: {
-      rut: patient.rut,
-      first_name: firstName,
-      last_name: lastName,
-      email: patient.email,
-      phone_number: patient.phone_number,
-    },
-  };
-
-  console.log("[create-order] POST", `${env.SKIPPAY_API_URL}/orders`);
-  console.log("[create-order] key prefix:", clientSecret.slice(0, 6) + "...");
-  console.log("[create-order] body:", JSON.stringify(requestBody));
-
-  const response = await fetch(`${env.SKIPPAY_API_URL}/orders`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${clientSecret}`,
-    },
-    body: JSON.stringify(requestBody),
+  const result = await createSkipPayOrder({
+    apiUrl: env.SKIP_PAY_API,
+    clientSecret,
+    patient,
+    totalAmount,
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    let detail: string;
-    try {
-      detail = JSON.stringify(JSON.parse(errorText));
-    } catch {
-      detail = errorText;
-    }
-    console.error(
-      "SkipPay order creation failed:",
-      response.status,
-      errorText,
-    );
+  if (!result.ok) {
     return Response.json(
-      { error: "Failed to create order", detail },
-      { status: response.status },
+      { error: result.error, detail: result.detail },
+      { status: result.status },
     );
   }
 
-  const data = (await response.json()) as CreateOrderResponse;
-  return Response.json(data);
+  return Response.json(result.data);
 };
