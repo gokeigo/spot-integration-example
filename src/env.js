@@ -18,11 +18,11 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_GOKEI_API_URL: z.string().url().optional(),
     NEXT_PUBLIC_GOKEI_WIDGET_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SKIP_PAY_API: z.string().url().optional(),
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: z
       .string()
       .optional()
       .transform((val) => (val === "PK_EXAMPLE" ? undefined : val)),
-    NEXT_PUBLIC_SKIPPAY_API_URL: z.string().url().optional(),
   },
 
   /**
@@ -33,8 +33,8 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_GOKEI_API_URL: process.env.NEXT_PUBLIC_GOKEI_API_URL,
     NEXT_PUBLIC_GOKEI_WIDGET_URL: process.env.NEXT_PUBLIC_GOKEI_WIDGET_URL,
+    NEXT_PUBLIC_SKIP_PAY_API: process.env.NEXT_PUBLIC_SKIP_PAY_API,
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: process.env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY,
-    NEXT_PUBLIC_SKIPPAY_API_URL: process.env.NEXT_PUBLIC_SKIPPAY_API_URL,
   },
 
   /**
@@ -47,10 +47,8 @@ export const env = createEnv({
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
    *
-   * SKIPPAY_API_URL and SKIPAY_CLIENT_SECRET are intentionally absent from this schema.
-   * They are server-side secrets used exclusively by the Cloudflare Pages Function at
-   * functions/api/create-order.ts and must be configured in the Cloudflare Pages dashboard
-   * under Settings > Environment Variables (not here at build time).
+   * SKIPAY_CLIENT_SECRET is intentionally absent from this schema because it must stay server-side.
+   * NEXT_PUBLIC_SKIP_PAY_API is exposed intentionally because it is only the public base URL.
    */
   emptyStringAsUndefined: true,
 });
