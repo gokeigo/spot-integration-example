@@ -18,6 +18,7 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_GOKEI_API_URL: z.string().url().optional(),
     NEXT_PUBLIC_GOKEI_WIDGET_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SKIP_PAY_API: z.string().url().optional(),
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: z
       .string()
       .optional()
@@ -32,6 +33,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_GOKEI_API_URL: process.env.NEXT_PUBLIC_GOKEI_API_URL,
     NEXT_PUBLIC_GOKEI_WIDGET_URL: process.env.NEXT_PUBLIC_GOKEI_WIDGET_URL,
+    NEXT_PUBLIC_SKIP_PAY_API: process.env.NEXT_PUBLIC_SKIP_PAY_API,
     NEXT_PUBLIC_GOKEI_PUBLIC_KEY: process.env.NEXT_PUBLIC_GOKEI_PUBLIC_KEY,
   },
 
@@ -45,9 +47,8 @@ export const env = createEnv({
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
    *
-   * SKIP_PAY_API and SKIPAY_CLIENT_SECRET are intentionally absent from this schema.
-   * They are server-side secrets used by the order-creation handlers in
-   * src/pages/api/create-order.ts and functions/api/create-order.ts.
+   * SKIPAY_CLIENT_SECRET is intentionally absent from this schema because it must stay server-side.
+   * NEXT_PUBLIC_SKIP_PAY_API is exposed intentionally because it is only the public base URL.
    */
   emptyStringAsUndefined: true,
 });

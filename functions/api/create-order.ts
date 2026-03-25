@@ -5,7 +5,7 @@ import {
 } from "../../src/server/create-order";
 
 interface Env {
-  SKIP_PAY_API?: string;
+  NEXT_PUBLIC_SKIP_PAY_API?: string;
   SKIPAY_CLIENT_SECRET?: string;
 }
 
@@ -16,9 +16,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
-  if (!env.SKIP_PAY_API) {
+  if (!env.NEXT_PUBLIC_SKIP_PAY_API) {
     return Response.json(
-      { error: "SKIP_PAY_API is not configured" },
+      { error: "NEXT_PUBLIC_SKIP_PAY_API is not configured" },
       { status: 500 },
     );
   }
@@ -41,7 +41,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   }
 
   const result = await createSkipPayOrder({
-    apiUrl: env.SKIP_PAY_API,
+    apiUrl: env.NEXT_PUBLIC_SKIP_PAY_API,
     clientSecret,
     patient,
     totalAmount,

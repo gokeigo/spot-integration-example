@@ -13,9 +13,9 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiUrl = process.env.SKIP_PAY_API;
+  const apiUrl = process.env.NEXT_PUBLIC_SKIP_PAY_API;
   if (!apiUrl) {
-    return res.status(500).json({ error: "SKIP_PAY_API is not configured" });
+    return res.status(500).json({ error: "NEXT_PUBLIC_SKIP_PAY_API is not configured" });
   }
 
   const body = req.body as CreateOrderRequestBody | undefined;
