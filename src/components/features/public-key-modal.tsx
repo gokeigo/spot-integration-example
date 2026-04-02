@@ -71,12 +71,12 @@ export function PublicKeyModal() {
   const [draftClientSecret, setDraftClientSecret] = useState(clientSecret);
   const [draftPatientPreset, setDraftPatientPreset] = useState<"not_registered" | "registered">(patientPreset);
   const [draftIntegrationType, setDraftIntegrationType] = useState(integrationType);
-  const [draftReimbursementFee, setDraftReimbursementFee] = useState(reimbursementFee === 0 ? 1000 : reimbursementFee);
+  const [draftReimbursementFee, setDraftReimbursementFee] = useState<number | "">(reimbursementFee === 0 ? 1000 : reimbursementFee);
   const [draftReimbursementMode, setDraftReimbursementMode] = useState<"free_trial" | "paid">(
     reimbursementFee === 0 ? "free_trial" : "paid",
   );
-  const [draftCnplSkipCommissionPercent, setDraftCnplSkipCommissionPercent] = useState(cnplSkipCommissionPercent);
-  const [draftConsultaCosto, setDraftConsultaCosto] = useState(consultaCosto);
+  const [draftCnplSkipCommissionPercent, setDraftCnplSkipCommissionPercent] = useState<number | "">(cnplSkipCommissionPercent);
+  const [draftConsultaCosto, setDraftConsultaCosto] = useState<number | "">(consultaCosto);
 
   const prevShowModalRef = useRef(false);
 
@@ -120,10 +120,10 @@ export function PublicKeyModal() {
     setPatient((prev) => ({ ...prev, ...preset }));
     setPatientPreset(draftPatientPreset);
     setintegrationType(draftIntegrationType);
-    setReimbursementFee(draftReimbursementMode === "free_trial" ? 0 : draftReimbursementFee);
+    setReimbursementFee(draftReimbursementMode === "free_trial" ? 0 : (draftReimbursementFee === "" ? 0 : draftReimbursementFee));
     setWorkflowType(draftWorkflowType);
-    setCnplSkipCommissionPercent(draftCnplSkipCommissionPercent);
-    setConsultaCosto(draftConsultaCosto);
+    setCnplSkipCommissionPercent(draftCnplSkipCommissionPercent === "" ? 0 : draftCnplSkipCommissionPercent);
+    setConsultaCosto(draftConsultaCosto === "" ? 0 : draftConsultaCosto);
     setShowModal(false);
   };
 
@@ -261,7 +261,7 @@ export function PublicKeyModal() {
                     id="cnpl-commission-input"
                     type="number"
                     value={draftCnplSkipCommissionPercent}
-                    onChange={(e) => setDraftCnplSkipCommissionPercent(Number(e.target.value))}
+                    onChange={(e) => setDraftCnplSkipCommissionPercent(e.target.value === "" ? "" : Number(e.target.value))}
                     min={0}
                     max={100}
                     step={0.1}
@@ -280,7 +280,7 @@ export function PublicKeyModal() {
                   id="consulta-costo-input"
                   type="number"
                   value={draftConsultaCosto}
-                  onChange={(e) => setDraftConsultaCosto(Number(e.target.value))}
+                  onChange={(e) => setDraftConsultaCosto(e.target.value === "" ? "" : Number(e.target.value))}
                   min={1}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 />
@@ -387,7 +387,7 @@ export function PublicKeyModal() {
                           id="reimbursement-fee-input"
                           type="number"
                           value={draftReimbursementFee}
-                          onChange={(e) => setDraftReimbursementFee(Number(e.target.value))}
+                          onChange={(e) => setDraftReimbursementFee(e.target.value === "" ? "" : Number(e.target.value))}
                           min={1}
                           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         />
