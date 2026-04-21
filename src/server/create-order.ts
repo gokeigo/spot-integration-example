@@ -7,6 +7,7 @@ interface Patient {
 
 export interface CreateOrderRequestBody {
   clientSecret?: string;
+  providerRut?: string;
   patient: Patient;
   totalAmount: number;
 }
@@ -22,12 +23,14 @@ export async function createSkipPayOrder({
   apiUrl,
   clientSecret,
   patient,
+  providerRut,
   totalAmount,
   fetchImpl = fetch,
 }: {
   apiUrl: string;
   clientSecret: string;
   patient: Patient;
+  providerRut?: string;
   totalAmount: number;
   fetchImpl?: typeof fetch;
 }): Promise<
@@ -41,6 +44,7 @@ export async function createSkipPayOrder({
   const requestBody = {
     reference: `ORDER-${Date.now()}`,
     total_amount: String(totalAmount),
+    ...(providerRut ? { provider_rut: providerRut } : {}),
     customer: {
       rut: patient.rut,
       first_name: firstName,

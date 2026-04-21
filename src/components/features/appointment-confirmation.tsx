@@ -8,6 +8,7 @@ import { patientAtom } from "~/atoms/patient";
 import { env } from "~/env";
 import ModalIframe from "./modal-iframe";
 import { usePublicKey } from "~/hooks/use-public-key";
+import { isCnplMetaProviderPublicKey } from "~/lib/provider-config";
 import { PiggyBank, AlertTriangle, Settings } from "lucide-react";
 import DivIframe from "./div-iframe";
 import { type GokeiWidgetResponse } from "~/types/gokei-spot";
@@ -17,16 +18,21 @@ async function createOrder(
   patient: { name: string; rut: string; email: string; phone_number: string },
   totalAmount: number,
   clientSecret?: string,
+  providerRut?: string,
   signal?: AbortSignal,
 ): Promise<string> {
   const trimmedClientSecret = clientSecret?.trim();
+  const trimmedProviderRut = providerRut?.trim();
 
   const parseErrorBody = async (response: Response) => {
     const text = await response.text();
     if (!text) return undefined;
 
     try {
-      const parsed = JSON.parse(text) as { error?: string; detail?: string | unknown[] };
+      const parsed = JSON.parse(text) as {
+        error?: string;
+        detail?: string | unknown[];
+      };
       return typeof parsed.detail === "string"
         ? parsed.detail
         : parsed.detail
@@ -41,7 +47,12 @@ async function createOrder(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     signal,
-    body: JSON.stringify({ patient, totalAmount, clientSecret: trimmedClientSecret }),
+    body: JSON.stringify({
+      patient,
+      totalAmount,
+      clientSecret: trimmedClientSecret,
+      providerRut: trimmedProviderRut,
+    }),
   });
 
   if (!response.ok) {
@@ -55,15 +66,64 @@ async function createOrder(
   return body.hash;
 }
 
+async function fetchWidgetData({
+  apiUrl,
+  publicKey,
+  patient,
+  signal,
+  orderToken,
+}: {
+  apiUrl: string | undefined;
+  publicKey: string;
+  patient: { rut: string; name: string; email: string; phone_number: string };
+  signal?: AbortSignal;
+  orderToken?: string;
+}): Promise<GokeiWidgetResponse> {
+  const nameParts = patient.name.split(" ");
+  const firstName = nameParts[0] ?? "";
+  const surname = nameParts.slice(1).join(" ");
+
+  const response = await fetch(`${apiUrl}/widget?public_key=${publicKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    signal,
+    body: JSON.stringify({
+      rut: patient.rut,
+      user_data: {
+        name: firstName,
+        surname,
+        rut: patient.rut,
+        email: patient.email,
+        phone_number: patient.phone_number,
+      },
+      ...(orderToken ? { order_token: orderToken } : {}),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Widget fetch failed (${response.status})`);
+  }
+
+  return response.json() as Promise<GokeiWidgetResponse>;
+}
+
 function AppointmentConfirmation() {
   const [patient] = useAtom(patientAtom);
   const [widgetUrl, setWidgetUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [widgetError, setWidgetError] = useState<string | null>(null);
   const [, setShowSettingsModal] = useAtom(showModalAtom);
-  const { integrationType, publicKey, workflowType, clientSecret, consultaCosto } = usePublicKey();
+  const {
+    integrationType,
+    publicKey,
+    workflowType,
+    clientSecret,
+    providerRut,
+    consultaCosto,
+  } = usePublicKey();
   const hasInitialized = useRef(false);
   const trimmedClientSecret = clientSecret.trim();
+  const trimmedProviderRut = providerRut.trim();
 
   // Stable primitives extracted from patient to avoid object-reference churn
   const patientRut = patient.rut;
@@ -74,6 +134,7 @@ function AppointmentConfirmation() {
 
   useEffect(() => {
     const isCnpl = workflowType === "cnpl";
+    const isMetaProvider = isCnplMetaProviderPublicKey(publicKey);
     if (!patientWantsReimbursement && !isCnpl) return;
 
     // ⚠️ These guards MUST come before the hasInitialized check.
@@ -82,6 +143,7 @@ function AppointmentConfirmation() {
     // real values, the effect re-fires and proceeds correctly.
     if (!publicKey) return;
     if (isCnpl && !trimmedClientSecret) return;
+    if (isCnpl && isMetaProvider && !trimmedProviderRut) return;
 
     // Single-run guard: prevent double-init from Strict Mode or hydration re-renders
     if (hasInitialized.current) return;
@@ -91,10 +153,6 @@ function AppointmentConfirmation() {
 
     const initializeGokeiWidget = async () => {
       try {
-        const nameParts = patientName.split(" ");
-        const surname = nameParts.slice(1).join(" ");
-        const firstName = nameParts[0] ?? "";
-
         const patientData = {
           name: patientName,
           rut: patientRut,
@@ -102,52 +160,35 @@ function AppointmentConfirmation() {
           phone_number: patientPhone,
         };
 
-        // Parallelize: createOrder (CNPL only) and fetchWidgetToken are independent.
-        // Note: if createOrder throws (e.g. SkipPay 4xx), Promise.all rejects and
-        // the widget fetch is also abandoned — same behavior as the original sequential code.
-        const [orderToken, widgetData] = await Promise.all([
-          isCnpl
-            ? createOrder(
-                patientData,
-                consultaCosto,
-                trimmedClientSecret || undefined,
-                abortController.signal,
-              )
-            : Promise.resolve(undefined),
-          fetch(
-            `${env.NEXT_PUBLIC_GOKEI_API_URL}/widget?public_key=${publicKey}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: abortController.signal,
-              body: JSON.stringify({
-                rut: patientRut,
-                user_data: {
-                  name: firstName,
-                  surname,
-                  rut: patientRut,
-                  email: patientEmail,
-                  phone_number: patientPhone,
-                },
-              }),
-            },
-          ).then(async (res) => {
-            if (!res.ok) throw new Error(`Widget fetch failed (${res.status})`);
-            return res.json() as Promise<GokeiWidgetResponse>;
-          }),
-        ]);
+        const orderToken = isCnpl
+          ? await createOrder(
+              patientData,
+              consultaCosto,
+              trimmedClientSecret || undefined,
+              isMetaProvider ? trimmedProviderRut || undefined : undefined,
+              abortController.signal,
+            )
+          : undefined;
+
+        const widgetData = await fetchWidgetData({
+          apiUrl: env.NEXT_PUBLIC_GOKEI_API_URL,
+          publicKey,
+          patient: patientData,
+          signal: abortController.signal,
+          orderToken,
+        });
 
         if (abortController.signal.aborted) return;
 
-        const url = orderToken
-          ? `${widgetData.url}&order_token=${orderToken}`
-          : widgetData.url;
-
-        setWidgetUrl(url);
+        setWidgetUrl(widgetData.url);
         setIsModalOpen(true);
       } catch (error) {
         if ((error as { name?: string }).name === "AbortError") return;
-        setWidgetError(error instanceof Error ? error.message : "Error desconocido al inicializar el widget");
+        setWidgetError(
+          error instanceof Error
+            ? error.message
+            : "Error desconocido al inicializar el widget",
+        );
       }
     };
 
@@ -167,6 +208,7 @@ function AppointmentConfirmation() {
     publicKey,
     workflowType,
     trimmedClientSecret,
+    trimmedProviderRut,
     consultaCosto,
   ]);
 
@@ -179,7 +221,9 @@ function AppointmentConfirmation() {
       <div className="flex items-start gap-3">
         <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" />
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-red-800">Error al inicializar el widget</p>
+          <p className="text-sm font-medium text-red-800">
+            Error al inicializar el widget
+          </p>
           <p className="font-mono text-xs text-red-600">{widgetError}</p>
           <button
             onClick={() => setShowSettingsModal(true)}

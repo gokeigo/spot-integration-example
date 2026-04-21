@@ -30,7 +30,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { clientSecret: bodySecret, patient, totalAmount } = body;
+  const { clientSecret: bodySecret, patient, totalAmount, providerRut } = body;
   const clientSecret = bodySecret ?? env.SKIPAY_CLIENT_SECRET;
 
   if (!clientSecret) {
@@ -46,6 +46,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       apiUrl: env.NEXT_PUBLIC_SKIP_PAY_API,
       clientSecret,
       patient,
+      providerRut,
       totalAmount,
     });
   } catch (error) {

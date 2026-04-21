@@ -1,5 +1,15 @@
 import { useAtom } from "jotai";
-import { publicKeyAtom, showModalAtom, integrationTypeAtom, reimbursementFeeAtom, workflowTypeAtom, clientSecretAtom, cnplSkipCommissionPercentAtom, consultaCostoAtom } from "~/atoms/simulation-settings";
+import {
+  publicKeyAtom,
+  showModalAtom,
+  integrationTypeAtom,
+  reimbursementFeeAtom,
+  workflowTypeAtom,
+  clientSecretAtom,
+  providerRutAtom,
+  cnplSkipCommissionPercentAtom,
+  consultaCostoAtom,
+} from "~/atoms/simulation-settings";
 import { env } from "~/env";
 
 export function usePublicKey() {
@@ -9,7 +19,10 @@ export function usePublicKey() {
   const [reimbursementFee, setReimbursementFee] = useAtom(reimbursementFeeAtom);
   const [workflowType, setWorkflowType] = useAtom(workflowTypeAtom);
   const [clientSecret, setClientSecret] = useAtom(clientSecretAtom);
-  const [cnplSkipCommissionPercent, setCnplSkipCommissionPercent] = useAtom(cnplSkipCommissionPercentAtom);
+  const [providerRut, setProviderRut] = useAtom(providerRutAtom);
+  const [cnplSkipCommissionPercent, setCnplSkipCommissionPercent] = useAtom(
+    cnplSkipCommissionPercentAtom,
+  );
   const [consultaCosto, setConsultaCosto] = useAtom(consultaCostoAtom);
 
   return {
@@ -25,6 +38,8 @@ export function usePublicKey() {
     setWorkflowType,
     clientSecret,
     setClientSecret,
+    providerRut,
+    setProviderRut,
     cnplSkipCommissionPercent,
     setCnplSkipCommissionPercent,
     consultaCosto,
