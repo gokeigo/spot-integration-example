@@ -35,7 +35,7 @@ export const Navbar = () => {
             Paciente
           </button>
           <Link
-            href="https://getskip.readme.io/reference"
+            href="https://docs.getskip.ai"
             target="_blank"
             className="flex items-center gap-1 rounded-lg border border-gray-200 px-2 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 sm:gap-1.5 sm:px-3 sm:text-sm"
           >
