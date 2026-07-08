@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import SuccessHeader from "~/components/ui/success/success-header";
 import AppointmentDetails from "~/components/ui/success/appointment-details";
@@ -11,8 +11,9 @@ import { usePublicKey } from "~/hooks/use-public-key";
 import { isCnplMetaProviderPublicKey } from "~/lib/provider-config";
 import { PiggyBank, AlertTriangle, Settings } from "lucide-react";
 import DivIframe from "./div-iframe";
+import GastosConsole from "./gastos-console";
 import { type GokeiWidgetResponse } from "~/types/gokei-spot";
-import { showModalAtom } from "~/atoms/simulation-settings";
+import { showModalAtom, patientPresetAtom } from "~/atoms/simulation-settings";
 
 async function createOrder(
   patient: { name: string; rut: string; email: string; phone_number: string },
@@ -112,7 +113,10 @@ function AppointmentConfirmation() {
   const [widgetUrl, setWidgetUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [widgetError, setWidgetError] = useState<string | null>(null);
+  const [orderHash, setOrderHash] = useState<string | null>(null);
+  const [registrationDone, setRegistrationDone] = useState(false);
   const [, setShowSettingsModal] = useAtom(showModalAtom);
+  const [patientPreset] = useAtom(patientPresetAtom);
   const {
     integrationType,
     publicKey,
@@ -170,6 +174,8 @@ function AppointmentConfirmation() {
             )
           : undefined;
 
+        setOrderHash(orderToken ?? null);
+
         const widgetData = await fetchWidgetData({
           apiUrl: env.NEXT_PUBLIC_GOKEI_API_URL,
           publicKey,
@@ -212,6 +218,14 @@ function AppointmentConfirmation() {
     consultaCosto,
   ]);
 
+  // A "registered" preset is already a beneficiary, so the gastos step can be
+  // exercised without completing the widget first.
+  useEffect(() => {
+    if (patientPreset === "registered") setRegistrationDone(true);
+  }, [patientPreset]);
+
+  const handleWidgetSuccess = useCallback(() => setRegistrationDone(true), []);
+
   const isCnpl = workflowType === "cnpl";
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   const showWidget = patient.wantsReimbursement || isCnpl;
@@ -245,7 +259,9 @@ function AppointmentConfirmation() {
             <SuccessHeader />
             <AppointmentDetails />
             {errorBanner}
-            {showWidget && !widgetError && <DivIframe url={widgetUrl ?? ""} />}
+            {showWidget && !widgetError && (
+              <DivIframe url={widgetUrl} onSuccess={handleWidgetSuccess} />
+            )}
             <NextSteps />
             <ActionButtons />
             <p className="mt-6 text-center text-gray-500">
@@ -253,6 +269,14 @@ function AppointmentConfirmation() {
               de la hora programada.
             </p>
           </div>
+          {showWidget && registrationDone && (
+            <GastosConsole
+              publicKey={publicKey}
+              rut={patient.rut}
+              orderHash={orderHash ?? undefined}
+              isCnpl={isCnpl}
+            />
+          )}
         </div>
       </div>
     );
@@ -282,6 +306,14 @@ function AppointmentConfirmation() {
               de la hora programada.
             </p>
           </div>
+          {showWidget && registrationDone && (
+            <GastosConsole
+              publicKey={publicKey}
+              rut={patient.rut}
+              orderHash={orderHash ?? undefined}
+              isCnpl={isCnpl}
+            />
+          )}
         </div>
       </div>
 
@@ -289,6 +321,7 @@ function AppointmentConfirmation() {
         url={widgetUrl ?? ""}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={handleWidgetSuccess}
       />
     </>
   );
