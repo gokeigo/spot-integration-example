@@ -1,11 +1,59 @@
+import { useEffect, useRef, useState } from "react";
+import {
+  WIDGET_FORM_SUCCESS,
+  WIDGET_PAYMENT_SUCCESS,
+} from "~/constants/events";
+
 interface DivIframeProps {
-  url: string;
+  url: string | null;
+  onSuccess?: () => void;
 }
 
-export const DivIframe = ({ url }: DivIframeProps) => {
+const frameClasses = "h-[820px] w-80 rounded-lg sm:w-[480px]";
+
+export const DivIframe = ({ url, onSuccess }: DivIframeProps) => {
+  const [loaded, setLoaded] = useState(false);
+  const onSuccessRef = useRef(onSuccess);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  }, [onSuccess]);
+
+  useEffect(() => {
+    function onReceivedMessage(event: MessageEvent) {
+      const domain = process.env.NEXT_PUBLIC_GOKEI_WIDGET_URL;
+      if (event.origin !== domain) return;
+      if (
+        event.data === WIDGET_FORM_SUCCESS ||
+        event.data === WIDGET_PAYMENT_SUCCESS
+      ) {
+        onSuccessRef.current?.();
+      }
+    }
+
+    window.addEventListener("message", onReceivedMessage);
+    return () => window.removeEventListener("message", onReceivedMessage);
+  }, []);
+
   return (
     <div className="flex items-center justify-center">
-      <iframe src={url} className="h-[820px] w-80 rounded-lg sm:w-[480px]" />
+      <div className="relative">
+        {/* Skeleton stays visible until the widget document finishes loading.
+            Avoids a blank box during DNS/TLS + widget boot. */}
+        {(!url || !loaded) && (
+          <div
+            className={`${frameClasses} animate-pulse bg-gray-100 ${url ? "absolute inset-0" : ""}`}
+          />
+        )}
+        {/* Only mount the iframe once we have a real URL. Rendering it with an
+            empty src makes the browser load the current page into the iframe. */}
+        {url && (
+          <iframe
+            src={url}
+            onLoad={() => setLoaded(true)}
+            className={`${frameClasses} ${loaded ? "" : "invisible"}`}
+          />
+        )}
+      </div>
     </div>
   );
 };

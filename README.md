@@ -28,12 +28,13 @@ Incluye:
 - validación local de RUT para pruebas,
 - consulta de estado de suscripción con `GET /spot/is_user_subscribed`,
 - inicialización del widget con `POST /spot/widget`,
+- envío de gastos (boletas y órdenes médicas) con `POST /spot/gastos` mediante upload real de archivos,
 - y para CNPL, una función server-side (`/api/create-order`) que crea la orden en `SkipPay`; en la simulación local el secreto también puede ingresarse desde la UI, por lo que no debe tomarse como patrón de producción.
 
 No incluye:
 
 - integración POS real del prestador,
-- envío de documentos vía `gastos` o `gastos-url`,
+- envío de documentos vía `gastos-url` (restringido a proveedores `dtemite` / `octava_software`),
 - recepción/validación completa de webhooks del prestador,
 - autenticación de operadores internos,
 - ni administración de tenants, credenciales o proveedores.
@@ -441,7 +442,7 @@ Una fuente común de confusión:
 - `widget` registra y clasifica al paciente,
 - `gastos` y `gastos-url` cargan boletas/documentos y disparan el procesamiento de rendiciones.
 
-Este repo demuestra `widget`, no demuestra `gastos`.
+Este repo demuestra ambos: `widget` (registro del paciente) y `gastos` (envío de boletas para rendición). La consola de gastos aparece en `/success` una vez que el paciente quedó registrado, porque `POST /spot/gastos` adjunta los documentos a un beneficiario existente.
 
 ### 3. POS es otro producto
 
@@ -549,6 +550,8 @@ Si el cliente quiere vender AAPD/CNPL, además del iframe necesita:
 - `src/components/features/div-iframe.tsx`: integración embebida en `div`.
 - `functions/api/create-order.ts`: proxy server-side para crear órdenes CNPL.
 - `src/server/create-order.ts`: cliente server-side para `POST /orders`.
+- `src/components/features/gastos-console.tsx`: consola de envío de gastos que aparece en `/success` tras el registro (form-data editable, snippets cURL/JS/Python y respuesta cruda).
+- `src/server/submit-gastos.ts`: cliente directo (multipart, **sin** proxy) de `POST /spot/gastos`; autentica sólo con `public_key`, por eso no necesita secreto server-side.
 - `docs/cnpl.md`: explicación del flujo CNPL desde la perspectiva del widget.
 
 ## Qué No Debe Documentarse o Compartirse
