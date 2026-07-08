@@ -11,9 +11,13 @@ import { usePublicKey } from "~/hooks/use-public-key";
 import { isCnplMetaProviderPublicKey } from "~/lib/provider-config";
 import { PiggyBank, AlertTriangle, Settings } from "lucide-react";
 import DivIframe from "./div-iframe";
-import GastosConsole from "./gastos-console";
 import { type GokeiWidgetResponse } from "~/types/gokei-spot";
-import { showModalAtom, patientPresetAtom } from "~/atoms/simulation-settings";
+import {
+  showModalAtom,
+  patientPresetAtom,
+  gastosUnlockedAtom,
+  gastosOrderHashAtom,
+} from "~/atoms/simulation-settings";
 
 async function createOrder(
   patient: { name: string; rut: string; email: string; phone_number: string },
@@ -113,10 +117,10 @@ function AppointmentConfirmation() {
   const [widgetUrl, setWidgetUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [widgetError, setWidgetError] = useState<string | null>(null);
-  const [orderHash, setOrderHash] = useState<string | null>(null);
-  const [registrationDone, setRegistrationDone] = useState(false);
   const [, setShowSettingsModal] = useAtom(showModalAtom);
   const [patientPreset] = useAtom(patientPresetAtom);
+  const [, setGastosUnlocked] = useAtom(gastosUnlockedAtom);
+  const [, setGastosOrderHash] = useAtom(gastosOrderHashAtom);
   const {
     integrationType,
     publicKey,
@@ -174,7 +178,7 @@ function AppointmentConfirmation() {
             )
           : undefined;
 
-        setOrderHash(orderToken ?? null);
+        setGastosOrderHash(orderToken ?? null);
 
         const widgetData = await fetchWidgetData({
           apiUrl: env.NEXT_PUBLIC_GOKEI_API_URL,
@@ -221,10 +225,13 @@ function AppointmentConfirmation() {
   // A "registered" preset is already a beneficiary, so the gastos step can be
   // exercised without completing the widget first.
   useEffect(() => {
-    if (patientPreset === "registered") setRegistrationDone(true);
-  }, [patientPreset]);
+    if (patientPreset === "registered") setGastosUnlocked(true);
+  }, [patientPreset, setGastosUnlocked]);
 
-  const handleWidgetSuccess = useCallback(() => setRegistrationDone(true), []);
+  const handleWidgetSuccess = useCallback(
+    () => setGastosUnlocked(true),
+    [setGastosUnlocked],
+  );
 
   const isCnpl = workflowType === "cnpl";
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -269,14 +276,6 @@ function AppointmentConfirmation() {
               de la hora programada.
             </p>
           </div>
-          {showWidget && registrationDone && (
-            <GastosConsole
-              publicKey={publicKey}
-              rut={patient.rut}
-              orderHash={orderHash ?? undefined}
-              isCnpl={isCnpl}
-            />
-          )}
         </div>
       </div>
     );
@@ -306,14 +305,6 @@ function AppointmentConfirmation() {
               de la hora programada.
             </p>
           </div>
-          {showWidget && registrationDone && (
-            <GastosConsole
-              publicKey={publicKey}
-              rut={patient.rut}
-              orderHash={orderHash ?? undefined}
-              isCnpl={isCnpl}
-            />
-          )}
         </div>
       </div>
 
