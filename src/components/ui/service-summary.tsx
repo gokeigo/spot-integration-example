@@ -1,6 +1,22 @@
-import { Clock, VideoIcon, Stethoscope, ChevronRight } from "lucide-react";
+import { useAtomValue } from "jotai";
+import {
+  Calendar,
+  ChevronRight,
+  Clock,
+  MapPin,
+  Stethoscope,
+  VideoIcon,
+} from "lucide-react";
+import {
+  DEFAULT_APPOINTMENT,
+  selectedAppointmentAtom,
+} from "~/atoms/appointment";
 
 export const ServiceSummary = () => {
+  const appointment =
+    useAtomValue(selectedAppointmentAtom) ?? DEFAULT_APPOINTMENT;
+  const isVideo = appointment.modality === "video";
+
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">
       <h2 className="mb-6 text-xl font-semibold text-gray-800">
@@ -8,11 +24,18 @@ export const ServiceSummary = () => {
       </h2>
       <div className="space-y-6">
         <div className="flex items-start gap-4 rounded-lg bg-blue-50 p-4">
-          <VideoIcon className="mt-1 h-6 w-6 text-blue-600" />
+          {isVideo ? (
+            <VideoIcon className="mt-1 h-6 w-6 text-blue-600" />
+          ) : (
+            <MapPin className="mt-1 h-6 w-6 text-blue-600" />
+          )}
           <div>
-            <h3 className="font-medium text-gray-900">Consulta por Video</h3>
+            <h3 className="font-medium text-gray-900">
+              {isVideo ? "Consulta por Video" : "Consulta Presencial"}
+            </h3>
             <p className="text-gray-600">
-              Sesión de 30 minutos con la Dra. Sarah Wilson
+              Sesión de {appointment.duration} minutos con{" "}
+              {appointment.doctorName}
             </p>
           </div>
         </div>
@@ -22,12 +45,18 @@ export const ServiceSummary = () => {
           </h3>
           <div className="space-y-4">
             <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-gray-500" />
+              <span className="text-gray-600">{appointment.dateLabel}</span>
+            </div>
+            <div className="flex items-center gap-3">
               <Clock className="h-5 w-5 text-gray-500" />
-              <span className="text-gray-600">Mañana, 14:00 hrs.</span>
+              <span className="text-gray-600">{appointment.time} hrs.</span>
             </div>
             <div className="flex items-center gap-3">
               <Stethoscope className="h-5 w-5 text-gray-500" />
-              <span className="text-gray-600">Consulta General</span>
+              <span className="text-gray-600">
+                {appointment.specialtyLabel}
+              </span>
             </div>
           </div>
         </div>
@@ -36,7 +65,9 @@ export const ServiceSummary = () => {
           <ul className="space-y-2">
             <li className="flex items-center gap-2 text-gray-600">
               <ChevronRight className="h-4 w-4 text-green-500" />
-              Plataforma de video segura
+              {isVideo
+                ? "Plataforma de video segura"
+                : "Atención en Centro Médico Telehealth, Providencia"}
             </li>
             <li className="flex items-center gap-2 text-gray-600">
               <ChevronRight className="h-4 w-4 text-green-500" />
@@ -44,7 +75,7 @@ export const ServiceSummary = () => {
             </li>
             <li className="flex items-center gap-2 text-gray-600">
               <ChevronRight className="h-4 w-4 text-green-500" />
-              Mensajes de seguimiento por 24 horas
+              Boleta electrónica reembolsable
             </li>
           </ul>
         </div>

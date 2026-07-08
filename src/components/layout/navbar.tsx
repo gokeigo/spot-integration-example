@@ -8,21 +8,52 @@ import {
   gastosUnlockedAtom,
 } from "~/atoms/simulation-settings";
 
-export const Navbar = () => {
+interface NavbarProps {
+  showLandingLinks?: boolean;
+}
+
+export const Navbar = ({ showLandingLinks = false }: NavbarProps) => {
   const { setShowModal } = usePublicKey();
   const [, setShowPatientModal] = useAtom(showPatientModalAtom);
   const [gastosUnlocked] = useAtom(gastosUnlockedAtom);
   return (
     <nav className="border-b border-gray-100 bg-white shadow-sm">
       <div className="mx-auto flex max-w-screen-xl items-center justify-between px-4 py-3">
-        <Link href="/">
-          <Image
-            src="/generic-telemedicine-logo.png"
-            alt="Logo de Ejemplo de integración Skip Spot"
-            width={48}
-            height={48}
-          />
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/generic-telemedicine-logo.png"
+              alt="Logo de Ejemplo de integración Skip Spot"
+              width={48}
+              height={48}
+            />
+            <span className="hidden text-sm font-semibold text-gray-900 md:block">
+              Centro Médico Telehealth
+            </span>
+          </Link>
+          {showLandingLinks && (
+            <div className="hidden items-center gap-4 lg:flex">
+              <Link
+                href="#especialidades"
+                className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+              >
+                Especialidades
+              </Link>
+              <Link
+                href="#resultados"
+                className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+              >
+                Horas disponibles
+              </Link>
+              <Link
+                href="#beneficios"
+                className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+              >
+                Beneficios
+              </Link>
+            </div>
+          )}
+        </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           <button
             onClick={() => setShowModal(true)}
