@@ -41,13 +41,7 @@ export default function Home() {
           onModalityChange={setModality}
           onSearch={scrollToResults}
         />
-        <SpecialtiesGrid
-          selected={specialtySlug}
-          onSelect={(slug) => {
-            setSpecialtySlug(slug);
-            if (slug) scrollToResults();
-          }}
-        />
+        <BenefitsSection />
         <DoctorList
           query={query}
           modality={modality}
@@ -59,7 +53,13 @@ export default function Home() {
           }}
         />
         <HowItWorks />
-        <BenefitsSection />
+        <SpecialtiesGrid
+          selected={specialtySlug}
+          onSelect={(slug) => {
+            setSpecialtySlug(slug);
+            if (slug) scrollToResults();
+          }}
+        />
         <SiteFooter />
       </main>
     </>

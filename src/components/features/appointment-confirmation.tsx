@@ -143,7 +143,10 @@ function AppointmentConfirmation() {
   useEffect(() => {
     const isCnpl = workflowType === "cnpl";
     const isMetaProvider = isCnplMetaProviderPublicKey(publicKey);
-    if (!patientWantsReimbursement && !isCnpl) return;
+    // The authorization is given via the checkout checkbox in both flows:
+    // Spot (reimbursement service) and CNPL/AAPD (30/70 split). Without it,
+    // no SkipPay order is created and the widget is not initialized.
+    if (!patientWantsReimbursement) return;
 
     // ⚠️ These guards MUST come before the hasInitialized check.
     // On SSR, atomWithStorage atoms have empty defaults. The guards return early

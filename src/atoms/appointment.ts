@@ -8,7 +8,6 @@ export interface SelectedAppointment {
   time: string;
   price: number;
   duration: number;
-  payMode: "full" | "aapd";
 }
 
 // Fallback used when /checkout is visited directly without picking a slot in
@@ -21,7 +20,6 @@ export const DEFAULT_APPOINTMENT: SelectedAppointment = {
   time: "14:00",
   price: 14000,
   duration: 30,
-  payMode: "full",
 };
 
 // In-memory: resets on full reload, like patientAtom.
