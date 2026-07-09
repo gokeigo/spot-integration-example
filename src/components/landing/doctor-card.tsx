@@ -68,9 +68,9 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
 
   return (
     <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
-      <div className="flex flex-col gap-6 lg:flex-row">
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-0">
         {/* Identity */}
-        <div className="min-w-0 flex-1 lg:w-1/2 lg:flex-none">
+        <div className="min-w-0 flex-1 lg:w-1/2 lg:flex-none lg:pr-6">
           <div className="flex items-start gap-4">
             <span
               className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${doctor.avatarClass}`}
