@@ -70,7 +70,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
     <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6">
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* Identity */}
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 lg:w-1/2 lg:flex-none">
           <div className="flex items-start gap-4">
             <span
               className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${doctor.avatarClass}`}
@@ -122,7 +122,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
         </div>
 
         {/* Pricing + slots */}
-        <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-[500px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+        <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-1/2 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h4 className="text-sm font-semibold text-gray-900">
@@ -137,7 +137,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
             {/* Informational only: the AAPD authorization itself is given in
                 the checkout, not here. */}
             <div className="flex flex-col items-end">
-              <div className="max-w-[280px] rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-right">
+              <div className="rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-right">
                 <p className="flex items-center justify-end gap-1 whitespace-nowrap text-sm font-bold text-violet-600">
                   Isapre o Seguro: {formatCLP(payToday)}
                   <TooltipProvider delayDuration={100}>
@@ -161,7 +161,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
                     </Tooltip>
                   </TooltipProvider>
                 </p>
-                <p className="mt-0.5 text-[10px] font-medium leading-snug text-violet-700/80">
+                <p className="mt-0.5 whitespace-nowrap text-[10px] font-medium leading-snug text-violet-700/80">
                   Con Skip paga 30% ahora y el resto cuando te reembolsen
                 </p>
               </div>
