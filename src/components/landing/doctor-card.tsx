@@ -122,7 +122,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
         </div>
 
         {/* Pricing + slots */}
-        <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-[440px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+        <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-[500px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h4 className="text-sm font-semibold text-gray-900">
@@ -137,24 +137,18 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
             {/* Informational only: the AAPD authorization itself is given in
                 the checkout, not here. */}
             <div className="flex flex-col items-end">
-              <span className="whitespace-nowrap text-sm text-gray-900">
-                Particular: {formatCLP(doctor.price)}
-              </span>
-              <div className="mt-1.5 max-w-[250px] rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-center">
-                <p className="whitespace-nowrap text-sm font-bold text-violet-600">
+              <div className="max-w-[280px] rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-right">
+                <p className="flex items-center justify-end gap-1 whitespace-nowrap text-sm font-bold text-violet-600">
                   Isapre o Seguro: {formatCLP(payToday)}
-                </p>
-                <p className="mt-0.5 text-[10px] font-medium leading-snug text-violet-700/80">
-                  Con Skip paga 30% ahora y el resto cuando te reembolsen{" "}
                   <TooltipProvider delayDuration={100}>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <button
                           type="button"
-                          className="inline-flex align-text-bottom text-violet-400 hover:text-violet-600"
+                          className="text-violet-400 hover:text-violet-600"
                           aria-label="Más información sobre el pago con reembolso"
                         >
-                          <Info className="h-3 w-3" />
+                          <Info className="h-3.5 w-3.5" />
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -167,7 +161,13 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
                     </Tooltip>
                   </TooltipProvider>
                 </p>
+                <p className="mt-0.5 text-[10px] font-medium leading-snug text-violet-700/80">
+                  Con Skip paga 30% ahora y el resto cuando te reembolsen
+                </p>
               </div>
+              <span className="mt-1.5 whitespace-nowrap text-sm text-gray-900">
+                Particular: {formatCLP(doctor.price)}
+              </span>
             </div>
           </div>
 
