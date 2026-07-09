@@ -123,46 +123,52 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
 
         {/* Pricing + slots */}
         <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-[440px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-          <div className="flex items-baseline justify-between gap-2">
-            <h4 className="text-sm font-semibold text-gray-900">{dateLabel}</h4>
-            <span className="whitespace-nowrap text-sm text-gray-900">
-              Particular: {formatCLP(doctor.price)}
-            </span>
-          </div>
-          <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-            <Clock className="h-3.5 w-3.5" />
-            Duración {doctor.duration} min
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">
+                {dateLabel}
+              </h4>
+              <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                <Clock className="h-3.5 w-3.5" />
+                Duración {doctor.duration} min
+              </p>
+            </div>
 
-          {/* Informational only: the AAPD authorization itself is given in
-              the checkout, not here. */}
-          <div className="mt-3 rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-center">
-            <p className="text-sm font-bold text-violet-600">
-              Isapre o Seguro: {formatCLP(payToday)}
-            </p>
-            <p className="mt-0.5 flex items-center justify-center gap-1 text-[10px] font-medium text-violet-700/80">
-              Con Skip paga 30% ahora y el resto cuando te reembolsen
-              <TooltipProvider delayDuration={100}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      className="text-violet-400 hover:text-violet-600"
-                      aria-label="Más información sobre el pago con reembolso"
-                    >
-                      <Info className="h-3 w-3" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-56 text-sm">
-                      Puedes activarlo en el pago: pagas el 30% al agendar y el
-                      70% restante cuando tu isapre o seguro te reembolse la
-                      consulta.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </p>
+            {/* Informational only: the AAPD authorization itself is given in
+                the checkout, not here. */}
+            <div className="flex flex-col items-end">
+              <span className="whitespace-nowrap text-sm text-gray-900">
+                Particular: {formatCLP(doctor.price)}
+              </span>
+              <div className="mt-1.5 max-w-[250px] rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-center">
+                <p className="whitespace-nowrap text-sm font-bold text-violet-600">
+                  Isapre o Seguro: {formatCLP(payToday)}
+                </p>
+                <p className="mt-0.5 text-[10px] font-medium leading-snug text-violet-700/80">
+                  Con Skip paga 30% ahora y el resto cuando te reembolsen{" "}
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex align-text-bottom text-violet-400 hover:text-violet-600"
+                          aria-label="Más información sobre el pago con reembolso"
+                        >
+                          <Info className="h-3 w-3" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-56 text-sm">
+                          Puedes activarlo en el pago: pagas el 30% al agendar
+                          y el 70% restante cuando tu isapre o seguro te
+                          reembolse la consulta.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
