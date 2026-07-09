@@ -122,7 +122,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
         </div>
 
         {/* Pricing + slots */}
-        <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-[360px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+        <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-[440px] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <div className="flex items-baseline justify-between gap-2">
             <h4 className="text-sm font-semibold text-gray-900">{dateLabel}</h4>
             <span className="whitespace-nowrap text-sm text-gray-900">
@@ -136,13 +136,12 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
 
           {/* Informational only: the AAPD authorization itself is given in
               the checkout, not here. */}
-          <div className="mt-3 text-right">
-            <p className="text-base font-bold text-gray-900">
-              Isapre o Seguro:{" "}
-              <span className="text-xl">{formatCLP(payToday)}</span>
+          <div className="mt-3 rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-center">
+            <p className="text-sm font-bold text-violet-600">
+              Isapre o Seguro: {formatCLP(payToday)}
             </p>
-            <p className="mt-0.5 flex items-center justify-end gap-1 text-xs font-medium text-violet-600">
-              Con Skip puedes reembolsar al momento
+            <p className="mt-0.5 flex items-center justify-center gap-1 text-[10px] font-medium text-violet-700/80">
+              Con Skip paga 30% ahora y el resto cuando te reembolsen
               <TooltipProvider delayDuration={100}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -151,7 +150,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
                       className="text-violet-400 hover:text-violet-600"
                       aria-label="Más información sobre el pago con reembolso"
                     >
-                      <Info className="h-3.5 w-3.5" />
+                      <Info className="h-3 w-3" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
