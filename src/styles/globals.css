@@ -62,5 +62,19 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Keeps a sane sans-serif stack even if next/font fails to inject the
+       Geist class (seen with turbopack dev), instead of falling back to the
+       browser default serif. */
+    font-family: var(
+      --font-geist-sans,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial,
+      sans-serif
+    );
   }
 }

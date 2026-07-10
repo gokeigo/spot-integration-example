@@ -9,7 +9,7 @@ import "~/styles/globals.css";
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <Provider>
-      <div className={GeistSans.className}>
+      <div className={`${GeistSans.variable} ${GeistSans.className}`}>
         <Component {...pageProps} />
         <PublicKeyModal />
         <PatientModal />
