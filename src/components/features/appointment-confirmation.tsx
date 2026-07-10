@@ -11,9 +11,13 @@ import { usePublicKey } from "~/hooks/use-public-key";
 import { isCnplMetaProviderPublicKey } from "~/lib/provider-config";
 import { PiggyBank, AlertTriangle, Settings } from "lucide-react";
 import DivIframe from "./div-iframe";
-import GastosConsole from "./gastos-console";
 import { type GokeiWidgetResponse } from "~/types/gokei-spot";
-import { showModalAtom, patientPresetAtom } from "~/atoms/simulation-settings";
+import {
+  showModalAtom,
+  patientPresetAtom,
+  gastosUnlockedAtom,
+  gastosOrderHashAtom,
+} from "~/atoms/simulation-settings";
 
 async function createOrder(
   patient: { name: string; rut: string; email: string; phone_number: string },
@@ -113,10 +117,10 @@ function AppointmentConfirmation() {
   const [widgetUrl, setWidgetUrl] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [widgetError, setWidgetError] = useState<string | null>(null);
-  const [orderHash, setOrderHash] = useState<string | null>(null);
-  const [registrationDone, setRegistrationDone] = useState(false);
   const [, setShowSettingsModal] = useAtom(showModalAtom);
   const [patientPreset] = useAtom(patientPresetAtom);
+  const [, setGastosUnlocked] = useAtom(gastosUnlockedAtom);
+  const [, setGastosOrderHash] = useAtom(gastosOrderHashAtom);
   const {
     integrationType,
     publicKey,
@@ -139,7 +143,10 @@ function AppointmentConfirmation() {
   useEffect(() => {
     const isCnpl = workflowType === "cnpl";
     const isMetaProvider = isCnplMetaProviderPublicKey(publicKey);
-    if (!patientWantsReimbursement && !isCnpl) return;
+    // The authorization is given via the checkout checkbox in both flows:
+    // Spot (reimbursement service) and CNPL/AAPD (30/70 split). Without it,
+    // no SkipPay order is created and the widget is not initialized.
+    if (!patientWantsReimbursement) return;
 
     // ⚠️ These guards MUST come before the hasInitialized check.
     // On SSR, atomWithStorage atoms have empty defaults. The guards return early
@@ -174,7 +181,7 @@ function AppointmentConfirmation() {
             )
           : undefined;
 
-        setOrderHash(orderToken ?? null);
+        setGastosOrderHash(orderToken ?? null);
 
         const widgetData = await fetchWidgetData({
           apiUrl: env.NEXT_PUBLIC_GOKEI_API_URL,
@@ -221,10 +228,13 @@ function AppointmentConfirmation() {
   // A "registered" preset is already a beneficiary, so the gastos step can be
   // exercised without completing the widget first.
   useEffect(() => {
-    if (patientPreset === "registered") setRegistrationDone(true);
-  }, [patientPreset]);
+    if (patientPreset === "registered") setGastosUnlocked(true);
+  }, [patientPreset, setGastosUnlocked]);
 
-  const handleWidgetSuccess = useCallback(() => setRegistrationDone(true), []);
+  const handleWidgetSuccess = useCallback(
+    () => setGastosUnlocked(true),
+    [setGastosUnlocked],
+  );
 
   const isCnpl = workflowType === "cnpl";
   // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -269,14 +279,6 @@ function AppointmentConfirmation() {
               de la hora programada.
             </p>
           </div>
-          {showWidget && registrationDone && (
-            <GastosConsole
-              publicKey={publicKey}
-              rut={patient.rut}
-              orderHash={orderHash ?? undefined}
-              isCnpl={isCnpl}
-            />
-          )}
         </div>
       </div>
     );
@@ -306,14 +308,6 @@ function AppointmentConfirmation() {
               de la hora programada.
             </p>
           </div>
-          {showWidget && registrationDone && (
-            <GastosConsole
-              publicKey={publicKey}
-              rut={patient.rut}
-              orderHash={orderHash ?? undefined}
-              isCnpl={isCnpl}
-            />
-          )}
         </div>
       </div>
 

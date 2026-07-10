@@ -298,7 +298,10 @@ export function GastosConsole({
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-1.5 sm:col-span-2">
                   <span className="text-xs font-medium text-gray-600">
-                    name
+                    name{" "}
+                    <span className="font-normal text-gray-400">
+                      (opcional)
+                    </span>
                   </span>
                   <input
                     value={values.name}
@@ -308,7 +311,10 @@ export function GastosConsole({
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-gray-600">
-                    date <span className="text-gray-400">· dd/mm/yyyy</span>
+                    date{" "}
+                    <span className="font-normal text-gray-400">
+                      (opcional) · dd/mm/yyyy
+                    </span>
                   </span>
                   <input
                     value={values.date}
@@ -318,7 +324,10 @@ export function GastosConsole({
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-gray-600">
-                    receipt_id
+                    receipt_id{" "}
+                    <span className="font-normal text-gray-400">
+                      (opcional)
+                    </span>
                   </span>
                   <input
                     value={values.receiptId}
@@ -329,7 +338,10 @@ export function GastosConsole({
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-gray-600">
-                    receipt_rut
+                    receipt_rut{" "}
+                    <span className="font-normal text-gray-400">
+                      (opcional)
+                    </span>
                   </span>
                   <input
                     value={values.receiptRut}
@@ -340,7 +352,10 @@ export function GastosConsole({
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-gray-600">
-                    doctor_rut <span className="text-gray-400">· opcional</span>
+                    doctor_rut{" "}
+                    <span className="font-normal text-gray-400">
+                      (opcional)
+                    </span>
                   </span>
                   <input
                     value={values.doctorRut}
@@ -351,7 +366,10 @@ export function GastosConsole({
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-gray-600">
-                    total <span className="text-gray-400">· CLP</span>
+                    total{" "}
+                    <span className="font-normal text-gray-400">
+                      (opcional) · CLP
+                    </span>
                   </span>
                   <input
                     value={values.total}
@@ -365,7 +383,9 @@ export function GastosConsole({
                   <label className="flex flex-col gap-1.5 sm:col-span-2">
                     <span className="text-xs font-medium text-gray-600">
                       skip_pay_order_id{" "}
-                      <span className="text-gray-400">· AAPD</span>
+                      <span className="font-normal text-gray-400">
+                        (opcional) · AAPD
+                      </span>
                     </span>
                     <input
                       value={values.skipPayOrderId}
@@ -379,7 +399,10 @@ export function GastosConsole({
                 )}
                 <div className="flex flex-col gap-2 sm:col-span-2">
                   <span className="text-xs font-medium text-gray-600">
-                    expense_subtypes
+                    expense_subtypes{" "}
+                    <span className="font-normal text-gray-400">
+                      (opcional)
+                    </span>
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {EXPENSE_SUBTYPE_OPTIONS.map((option) => {

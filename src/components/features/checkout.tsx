@@ -35,13 +35,21 @@ export const Checkout = () => {
 
   const calculateTotal = () => {
     if (isCnpl) {
-      return cnplPayNow + cnplCommission;
+      // The AAPD split only applies once the patient authorizes it via the
+      // checkout checkbox; otherwise it is a regular full payment.
+      return isChecked ? cnplPayNow + cnplCommission : basePrice + platformFee;
     }
     let total = basePrice + platformFee;
     if (isChecked && isSubscribed === false) {
       total += reimbursementFee;
     }
     return total;
+  };
+
+  const handleAapdCheckboxChange = () => {
+    const newCheckedState = !isChecked;
+    setIsChecked(newCheckedState);
+    setPatient((prev) => ({ ...prev, wantsReimbursement: newCheckedState }));
   };
 
   const handleCheckboxChange = async () => {
@@ -80,7 +88,7 @@ export const Checkout = () => {
           Detalles del Pago
         </h2>
         <div className="mb-6 space-y-4">
-          {isCnpl ? (
+          {isCnpl && isChecked ? (
             <>
               <div className="flex justify-between border-b border-gray-100 py-2">
                 <span className="text-xs text-gray-400">Costo de Consulta</span>
@@ -93,6 +101,14 @@ export const Checkout = () => {
               <div className="flex justify-between border-b border-gray-100 py-2">
                 <span className="text-xs text-gray-400">Comisión Skip ({cnplSkipCommissionPercent}%)</span>
                 <span className="text-xs text-gray-400">{formatPrice(cnplCommission)}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 py-2">
+                <span className="text-xs text-gray-400">
+                  Saldo al reembolsar (70%)
+                </span>
+                <span className="text-xs text-gray-400">
+                  {formatPrice(basePrice - cnplPayNow)}
+                </span>
               </div>
             </>
           ) : (
@@ -140,25 +156,46 @@ export const Checkout = () => {
 
         <div className="mb-6">
           {isCnpl ? (
-            <div className="mb-4 rounded-xl border border-purple-200 bg-purple-50 p-4">
-              <div className="flex items-start gap-3">
-                <Image
-                  src={GokeiLogo as string}
-                  alt="Skip Logo"
-                  width={64}
-                  height={64}
-                  unoptimized
+            <div className="mb-4">
+              <label
+                htmlFor="aapd-checkbox"
+                className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4 transition hover:bg-gray-50 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50"
+              >
+                <input
+                  type="checkbox"
+                  id="aapd-checkbox"
+                  checked={isChecked}
+                  onChange={handleAapdCheckboxChange}
+                  className="mt-1 h-4 w-4 flex-shrink-0 cursor-pointer accent-purple-600"
                 />
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-purple-800">
+                <div className="flex flex-col gap-1.5">
+                  <Image
+                    src={GokeiLogo as string}
+                    alt="Skip Logo"
+                    width={80}
+                    height={80}
+                    unoptimized
+                  />
+                  <span className="text-sm font-medium text-gray-900">
                     Atiéndete Ahora y Paga Después
                   </span>
-                  <span className="text-sm text-purple-700">
-                    Pagas el 30% ahora. El 70% restante lo pagas cuando tu isapre
-                    te reembolse.
+                  <span className="text-sm text-gray-600">
+                    Paga solo el 30% ({formatPrice(cnplPayNow)}) ahora. El 70%
+                    restante lo pagas cuando tu isapre o seguro te reembolse.
                   </span>
                 </div>
-              </div>
+              </label>
+              <p className="mt-2 px-1 text-xs text-gray-500">
+                Al activar este servicio aceptas los{" "}
+                <Link
+                  href="https://www.getskip.ai/terminos-y-condiciones"
+                  target="_blank"
+                  className="font-medium text-purple-700 underline hover:text-purple-900"
+                >
+                  Términos y Condiciones
+                </Link>{" "}
+                del servicio de Skip.
+              </p>
             </div>
           ) : (
             <label
@@ -206,6 +243,19 @@ export const Checkout = () => {
                 </span>
               </div>
             </label>
+          )}
+          {!isCnpl && (
+            <p className="-mt-2 mb-4 px-1 text-xs text-gray-500">
+              Al activar este servicio aceptas los{" "}
+              <Link
+                href="https://www.getskip.ai/terminos-y-condiciones"
+                target="_blank"
+                className="font-medium text-purple-700 underline hover:text-purple-900"
+              >
+                Términos y Condiciones
+              </Link>{" "}
+              del servicio de Skip.
+            </p>
           )}
 
           <div className="rounded-lg bg-gray-50 p-4">
