@@ -122,8 +122,8 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
         </div>
 
         {/* Pricing + slots */}
-        <div className="flex-shrink-0 border-t border-gray-100 pt-5 lg:w-1/2 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-          <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 border-t border-gray-100 pt-5 lg:w-1/2 lg:flex-shrink-0 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h4 className="text-sm font-semibold text-gray-900">
                 {dateLabel}
@@ -136,10 +136,13 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
 
             {/* Informational only: the AAPD authorization itself is given in
                 the checkout, not here. */}
-            <div className="flex flex-col items-end">
+            <div className="flex w-full flex-col items-stretch sm:w-auto sm:items-end">
               <div className="rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-right">
-                <p className="flex items-center justify-end gap-1 whitespace-nowrap text-sm font-bold text-violet-600">
-                  Isapre o Seguro: {formatCLP(payToday)}
+                <p className="flex flex-wrap items-center justify-end gap-1 text-sm font-bold text-violet-600">
+                  Isapre o Seguro:{" "}
+                  <span className="whitespace-nowrap">
+                    {formatCLP(payToday)}
+                  </span>
                   <TooltipProvider delayDuration={100}>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -161,12 +164,15 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
                     </Tooltip>
                   </TooltipProvider>
                 </p>
-                <p className="mt-0.5 whitespace-nowrap text-[10px] font-medium leading-snug text-violet-700/80">
+                <p className="mt-0.5 text-[10px] font-medium leading-snug text-violet-700/80">
                   Con Skip paga 30% ahora y el resto cuando te reembolsen
                 </p>
               </div>
-              <span className="mt-1.5 whitespace-nowrap text-sm text-gray-900">
-                Particular: {formatCLP(doctor.price)}
+              <span className="mt-1.5 text-right text-sm text-gray-900">
+                Particular:{" "}
+                <span className="whitespace-nowrap">
+                  {formatCLP(doctor.price)}
+                </span>
               </span>
             </div>
           </div>
