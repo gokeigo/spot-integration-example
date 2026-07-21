@@ -21,6 +21,7 @@ export const Checkout = () => {
   const { publicKey, reimbursementFee, workflowType, cnplSkipCommissionPercent, consultaCosto } = usePublicKey();
   const [isChecked, setIsChecked] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [commissionTooltipOpen, setCommissionTooltipOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState<boolean | undefined>(
     undefined,
@@ -30,17 +31,15 @@ export const Checkout = () => {
   const platformFee = 5000;
   const isCnpl = workflowType === "cnpl";
 
-  const cnplPayNow = Math.round(basePrice * 0.3);
   const cnplCommission = Math.round(basePrice * cnplSkipCommissionPercent / 100);
+  // The commission is prorated into the charges: 30% with the first
+  // installment, 70% with the second, same split as the consultation price.
+  const cnplPayNow = Math.round((basePrice + cnplCommission) * 0.3);
+  const cnplSecondInstallment = basePrice + cnplCommission - cnplPayNow;
 
   const calculateTotal = () => {
-    if (isCnpl) {
-      // The AAPD split only applies once the patient authorizes it via the
-      // checkout checkbox; otherwise it is a regular full payment.
-      return isChecked ? cnplPayNow + cnplCommission : basePrice + platformFee;
-    }
     let total = basePrice + platformFee;
-    if (isChecked && isSubscribed === false) {
+    if (!isCnpl && isChecked && isSubscribed === false) {
       total += reimbursementFee;
     }
     return total;
@@ -91,23 +90,57 @@ export const Checkout = () => {
           {isCnpl && isChecked ? (
             <>
               <div className="flex justify-between border-b border-gray-100 py-2">
-                <span className="text-xs text-gray-400">Costo de Consulta</span>
-                <span className="text-xs text-gray-400">{formatPrice(basePrice)}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-gray-100 py-3">
-                <span className="font-medium text-gray-900">Pagas ahora (30%)</span>
-                <span className="text-lg font-semibold text-blue-600">{formatPrice(cnplPayNow)}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-100 py-2">
-                <span className="text-xs text-gray-400">Comisión Skip ({cnplSkipCommissionPercent}%)</span>
-                <span className="text-xs text-gray-400">{formatPrice(cnplCommission)}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-100 py-2">
-                <span className="text-xs text-gray-400">
-                  Saldo al reembolsar (70%)
+                <span className="text-sm text-gray-500">Precio consulta</span>
+                <span className="text-sm text-gray-500">
+                  {formatPrice(basePrice)}
                 </span>
-                <span className="text-xs text-gray-400">
-                  {formatPrice(basePrice - cnplPayNow)}
+              </div>
+              <div className="flex justify-between border-b border-gray-100 py-2">
+                <span className="flex items-center gap-1 text-sm text-gray-500">
+                  Comisión Skip
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip
+                      open={commissionTooltipOpen}
+                      onOpenChange={setCommissionTooltipOpen}
+                    >
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCommissionTooltipOpen(!commissionTooltipOpen)
+                          }
+                          className="text-gray-400 hover:text-gray-600"
+                          aria-label="Más información sobre la comisión Skip"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-64 text-sm">
+                          La comisión se prorratea a los cobros. Es decir, 30%
+                          se cobra en la primera cuota, 70% en la segunda
+                          cuota, igual que el costo de la consulta.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </span>
+                <span className="text-sm text-gray-500">
+                  {formatPrice(cnplCommission)}
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-gray-100 py-2">
+                <span className="text-sm text-gray-500">2da cuota (70%)</span>
+                <span className="text-sm text-gray-500">
+                  {formatPrice(cnplSecondInstallment)}
+                </span>
+              </div>
+              <div className="flex justify-between py-3">
+                <span className="font-bold text-gray-900">
+                  Pagas ahora (30%)
+                </span>
+                <span className="font-bold text-gray-900">
+                  {formatPrice(cnplPayNow)}
                 </span>
               </div>
             </>
@@ -142,16 +175,16 @@ export const Checkout = () => {
                   </span>
                 </div>
               )}
+              <div className="flex justify-between py-3">
+                <span className="font-medium text-gray-900">Total</span>
+                <span
+                  className={`text-lg font-semibold text-blue-600 ${isLoading ? "animate-pulse rounded bg-gray-200 px-3" : ""}`}
+                >
+                  {!isLoading && formatPrice(calculateTotal())}
+                </span>
+              </div>
             </>
           )}
-          <div className="flex justify-between py-3">
-            <span className="font-medium text-gray-900">Total</span>
-            <span
-              className={`text-lg font-semibold text-blue-600 ${isLoading ? "animate-pulse rounded bg-gray-200 px-3" : ""}`}
-            >
-              {!isLoading && formatPrice(calculateTotal())}
-            </span>
-          </div>
         </div>
 
         <div className="mb-6">
