@@ -71,19 +71,26 @@ export const ModalIframe = ({
 
   if (!isOpen) return null;
 
+  // Fullscreen on mobile; centered 480px-wide card on sm+ capped to the
+  // viewport height so the widget never gets clipped.
+  const frameClasses =
+    "h-full w-full sm:h-[min(820px,calc(100dvh-2rem))] sm:w-[480px] sm:rounded-lg";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center sm:p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-      <div className="relative rounded-lg bg-white">
+      <div className="relative h-full w-full overflow-hidden bg-white sm:h-auto sm:w-auto sm:rounded-lg">
         {!loaded && (
-          <div className="absolute inset-0 flex h-[820px] w-80 animate-pulse items-center justify-center rounded-lg bg-gray-100 sm:w-[480px]">
+          <div
+            className={`absolute inset-0 flex animate-pulse items-center justify-center bg-gray-100 ${frameClasses}`}
+          >
             <span className="text-sm text-gray-400">Cargando…</span>
           </div>
         )}
         <iframe
           src={url}
           onLoad={() => setLoaded(true)}
-          className={`h-[820px] w-80 rounded-lg sm:w-[480px] ${loaded ? "" : "invisible"}`}
+          className={`${frameClasses} ${loaded ? "" : "invisible"}`}
         />
       </div>
     </div>

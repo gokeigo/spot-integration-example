@@ -9,7 +9,8 @@ interface DivIframeProps {
   onSuccess?: () => void;
 }
 
-const frameClasses = "h-[820px] w-80 rounded-lg sm:w-[480px]";
+const frameClasses =
+  "h-[min(820px,calc(100dvh-2rem))] w-full max-w-[480px] rounded-lg";
 
 export const DivIframe = ({ url, onSuccess }: DivIframeProps) => {
   const [loaded, setLoaded] = useState(false);
@@ -36,7 +37,7 @@ export const DivIframe = ({ url, onSuccess }: DivIframeProps) => {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="relative">
+      <div className="relative w-full max-w-[480px]">
         {/* Skeleton stays visible until the widget document finishes loading.
             Avoids a blank box during DNS/TLS + widget boot. */}
         {(!url || !loaded) && (
