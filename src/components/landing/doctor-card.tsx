@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { Clock, Info, MapPin, Star, Users, Video } from "lucide-react";
 import {
   formatCLP,
@@ -10,7 +10,10 @@ import {
   type Doctor,
 } from "~/lib/appointments-data";
 import { selectedAppointmentAtom } from "~/atoms/appointment";
-import { consultaCostoAtom } from "~/atoms/simulation-settings";
+import {
+  cnplSkipCommissionPercentAtom,
+  consultaCostoAtom,
+} from "~/atoms/simulation-settings";
 import {
   Tooltip,
   TooltipContent,
@@ -34,13 +37,19 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
   const router = useRouter();
   const setAppointment = useSetAtom(selectedAppointmentAtom);
   const setConsultaCosto = useSetAtom(consultaCostoAtom);
+  const commissionPercent = useAtomValue(cnplSkipCommissionPercentAtom);
   const [showAll, setShowAll] = useState(false);
 
   const specialty = getSpecialty(doctor.specialtySlug);
   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
   const times = getTimesForDay(doctor, dayOffset, isWeekend);
   const visibleTimes = showAll ? times : times.slice(0, VISIBLE_SLOTS);
-  const payToday = Math.round(doctor.price * 0.3);
+  // Mirrors the checkout AAPD math: the Skip commission is prorated into the
+  // installments, so the upfront 30% applies over price + commission.
+  const skipCommission = Math.round(
+    (doctor.price * commissionPercent) / 100,
+  );
+  const payToday = Math.round((doctor.price + skipCommission) * 0.3);
   const dateLabel = capitalize(
     date.toLocaleDateString("es-CL", {
       weekday: "long",
@@ -139,7 +148,7 @@ export const DoctorCard = ({ doctor, date, dayOffset }: DoctorCardProps) => {
             <div className="flex w-full flex-col items-stretch sm:w-auto sm:items-end">
               <div className="rounded-xl border border-violet-200/80 bg-violet-100/50 px-3 py-2 text-right">
                 <p className="flex flex-wrap items-center justify-end gap-1 text-sm font-bold text-violet-600">
-                  Isapre o Seguro:{" "}
+                  Isapre:{" "}
                   <span className="whitespace-nowrap">
                     {formatCLP(payToday)}
                   </span>
