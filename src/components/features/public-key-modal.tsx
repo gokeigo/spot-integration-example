@@ -61,8 +61,6 @@ export function PublicKeyModal() {
     setProviderRut,
     cnplSkipCommissionPercent,
     setCnplSkipCommissionPercent,
-    consultaCosto,
-    setConsultaCosto,
   } = usePublicKey();
   const router = useRouter();
   const [, setPatient] = useAtom(patientAtom);
@@ -88,9 +86,6 @@ export function PublicKeyModal() {
   >(reimbursementFee === 0 ? "free_trial" : "paid");
   const [draftCnplSkipCommissionPercent, setDraftCnplSkipCommissionPercent] =
     useState<number | "">(cnplSkipCommissionPercent);
-  const [draftConsultaCosto, setDraftConsultaCosto] = useState<number | "">(
-    consultaCosto,
-  );
 
   const prevShowModalRef = useRef(false);
 
@@ -111,7 +106,6 @@ export function PublicKeyModal() {
     setDraftReimbursementFee(reimbursementFee === 0 ? 1000 : reimbursementFee);
     setDraftReimbursementMode(reimbursementFee === 0 ? "free_trial" : "paid");
     setDraftCnplSkipCommissionPercent(cnplSkipCommissionPercent);
-    setDraftConsultaCosto(consultaCosto);
 
     if (routerPathname !== "/") {
       void router.push("/");
@@ -126,7 +120,6 @@ export function PublicKeyModal() {
     integrationType,
     reimbursementFee,
     cnplSkipCommissionPercent,
-    consultaCosto,
     router,
     routerPathname,
   ]);
@@ -165,7 +158,6 @@ export function PublicKeyModal() {
         ? 0
         : draftCnplSkipCommissionPercent,
     );
-    setConsultaCosto(draftConsultaCosto === "" ? 0 : draftConsultaCosto);
     setShowModal(false);
   };
 
@@ -344,60 +336,36 @@ export function PublicKeyModal() {
             </section>
           )}
 
-          {/* Skip commission % and Costo Consulta (CNPL only) */}
+          {/* Skip commission % (CNPL only) */}
           {isCnpl && (
-            <>
-              <section className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="cnpl-commission-input"
-                  className="flex items-center gap-1.5 text-sm font-medium text-gray-700"
-                >
-                  Comisión Skip (% del costo de consulta)
-                  <InfoTooltip text="Porcentaje que Skip cobra sobre el costo de consulta en el flujo Atiéndete Ahora y Paga Después." />
-                </label>
-                <div className="relative">
-                  <input
-                    id="cnpl-commission-input"
-                    type="number"
-                    value={draftCnplSkipCommissionPercent}
-                    onChange={(e) =>
-                      setDraftCnplSkipCommissionPercent(
-                        e.target.value === "" ? "" : Number(e.target.value),
-                      )
-                    }
-                    min={0}
-                    max={100}
-                    step={0.1}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 pr-8 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
-                    %
-                  </span>
-                </div>
-              </section>
-
-              <section className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="consulta-costo-input"
-                  className="flex items-center gap-1.5 text-sm font-medium text-gray-700"
-                >
-                  Costo Consulta (CLP)
-                  <InfoTooltip text="Monto de la consulta. Se usa para calcular el cobro en el checkout y como monto de la orden CNPL." />
-                </label>
+            <section className="flex flex-col gap-1.5">
+              <label
+                htmlFor="cnpl-commission-input"
+                className="flex items-center gap-1.5 text-sm font-medium text-gray-700"
+              >
+                Comisión Skip (% del costo de consulta)
+                <InfoTooltip text="Porcentaje que Skip cobra sobre el costo de consulta en el flujo Atiéndete Ahora y Paga Después." />
+              </label>
+              <div className="relative">
                 <input
-                  id="consulta-costo-input"
+                  id="cnpl-commission-input"
                   type="number"
-                  value={draftConsultaCosto}
+                  value={draftCnplSkipCommissionPercent}
                   onChange={(e) =>
-                    setDraftConsultaCosto(
+                    setDraftCnplSkipCommissionPercent(
                       e.target.value === "" ? "" : Number(e.target.value),
                     )
                   }
-                  min={1}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                  min={0}
+                  max={100}
+                  step={0.1}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 pr-8 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 />
-              </section>
-            </>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">
+                  %
+                </span>
+              </div>
+            </section>
           )}
 
           <div className="border-t border-gray-100" />
